@@ -64,4 +64,19 @@ public class JwtService {
 	private Date extractExpriation(String token) {
 		return extractClaim(token, Claims::getExpiration);
 	}
+
+	public boolean validateToken(String token) {
+	     return !istokenexpired(token);
+	}
+
+	public Object extractUserId(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+	
+	public String extractToken(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
 }

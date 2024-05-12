@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,7 @@ public class AuthenticationService {
 			errorDto.setMessage("Usernot found.!");
 			response.put("status", 0);
 			response.put("error", errorDto);
-			return ResponseEntity.badRequest().body(response);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		}
 
 		User user = userOptional.get();
@@ -66,7 +67,7 @@ public class AuthenticationService {
 			response.put("Status", "0");
 			response.put("error", errorDto);
 
-			return ResponseEntity.badRequest().body(response);
+			return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response); 
 		}
 
 		final String token = jwtService.generateToken(user);
@@ -74,6 +75,7 @@ public class AuthenticationService {
 		response.put("message", "Logged in successfully.!");
 		response.put("jwt", token);
 		response.put("userId", user.getId());
+		response.put("userName", user.getUsername());
 		response.put("role", user.getRole());
 
 		return ResponseEntity.ok().body(response);

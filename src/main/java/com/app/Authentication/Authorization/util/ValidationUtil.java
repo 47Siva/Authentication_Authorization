@@ -43,7 +43,7 @@ public class ValidationUtil {
 	}
 
 	public static boolean isValidEmailId(String value) {
-		String regex = "^(?=.{1,64}@)[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z0-9-.]+$";
+		String regex = "^(?=.{1,64}@)[a-zA-Z][a-zA-Z0-9]+@[a-zA-Z0-9.-]+\\.[a-zA-Z0-9-.]+$";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
 		return m.matches();
@@ -78,7 +78,7 @@ public class ValidationUtil {
 		if (userName == null || userName.length() < 3 || userName.length() > 20) {
 			return false;
 		}
-		return userName.matches("^[a-zA-Z0-9_]+$");
+		return userName.matches("^[a-zA-Z][a-zA-Z0-9]+$");
 
 //		IF THE USERNAME IS "USER123", IT WILL RETURN TRUE BECAUSE IT MEETS ALL THE CRITERIA.
 //		IF THE USERNAME IS "USER!123", IT WILL RETURN FALSE BECAUSE IT CONTAINS A SPECIAL CHARACTER (!) WHICH IS NOT ALLOWED.
