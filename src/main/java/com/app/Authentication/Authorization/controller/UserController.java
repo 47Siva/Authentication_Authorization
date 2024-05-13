@@ -45,10 +45,9 @@ public class UserController {
 	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Id api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping(value = "/getUser/{id}", produces = "application/json")
-	public ResponseEntity<?>getUser(@PathVariable ("id") UUID id,@RequestHeader(value = "Authorization") String auth){
+	@GetMapping(value = "/getUser/{username}", produces = "application/json")
+	public ResponseEntity<?>getUser(@PathVariable ("username") String username,@RequestHeader(value = "Authorization") String token){
 		
-		return userService.getuserDetails(id,auth);
-           
+		 return userService.getuserDetails(username, token);
 	}
 }
