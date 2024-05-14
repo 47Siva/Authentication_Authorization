@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.app.Authentication.Authorization.advice.MalformedJwtException;
+import com.app.Authentication.Authorization.advice.NoSuchElementException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.UserStatus;
@@ -21,6 +22,7 @@ import com.app.Authentication.Authorization.response.UserResponse;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.util.PasswordUtil;
 
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -78,6 +80,8 @@ public class UserService implements UserDetailsService {
 	}
 
 	public ResponseEntity<?> getuserDetailsUserNameFromToken(String username, String auth) {
+		// Construct response
+		Map<String, Object> response = new HashMap<>();
 		try {
 			String token = jwtService.extractToken(auth);
 			// Validate token
@@ -85,34 +89,32 @@ public class UserService implements UserDetailsService {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 			}
 			Optional<User> userdetails = userRepository.findByUserName(username);
-			// Retrieve user details
-			UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
-			Optional<User> details = userRepository.findById(userdetails.get().getId());
 			
-			// Construct response
-			Map<String, Object> response = new HashMap<>();
-			if(!details.get().getRole().equals(Role.USER)) {
-				response.put("Status",HttpStatus.NOT_ACCEPTABLE.toString());
-				response.put("message", "User can't access the request");
-				response.put("Error", HttpStatus.NOT_ACCEPTABLE);
-				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
-			}else if (details.isPresent()) {
-				User user = details.get();
+			if (userdetails.isPresent()) {
+				User user = userdetails.get();
+				
+				if (!user.getRole().equals(Role.USER)) {
+					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
+					response.put("message", "User can't access the request");
+					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+				}
 				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
 						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 
+				// Retrieve user details
+				UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
 				response.put("Authorities", userDetails.getAuthorities());
 				response.put("Details", userresponse);
 				return ResponseEntity.ok(response);
-			}else {
-				response.put("Status", HttpStatus.NO_CONTENT.toString());
+			} else {
+				response.put("Status", HttpStatus.BAD_REQUEST.toString());
 				response.put("message", "User id is invalid pleas check the ID");
-				response.put("Error", HttpStatus.NO_CONTENT);
-				return ResponseEntity.internalServerError().body(response);
+				response.put("Error", HttpStatus.BAD_REQUEST);
+				return ResponseEntity.badRequest().body(response);
 			}
 		}catch (Exception e) {
-			e.printStackTrace();
-			throw new MalformedJwtException("Token is invalid");
+			throw new SignatureException("Signature verification failed for the JWT token.");
 		}
 	}
 

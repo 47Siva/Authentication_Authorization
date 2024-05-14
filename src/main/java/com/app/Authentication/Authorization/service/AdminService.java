@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.app.Authentication.Authorization.advice.MalformedJwtException;
 import com.app.Authentication.Authorization.advice.NoSuchElementException;
+import com.app.Authentication.Authorization.advice.SignatureException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.UserStatus;
@@ -18,6 +18,7 @@ import com.app.Authentication.Authorization.repository.UserRepository;
 import com.app.Authentication.Authorization.response.UserResponse;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.util.PasswordUtil;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,17 +45,16 @@ public class AdminService {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 		}
 		Optional<User> userdetails = userRepository.findByUserName(username);
-		// Retrieve user details
-		UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
-		Optional<User> details = userRepository.findById(userdetails.get().getId());
 		
 		// Construct response
 		Map<String, Object> response = new HashMap<>();
-		if (details.isPresent()) {
-			User user = details.get();
+		if (userdetails.isPresent()) {
+			User user = userdetails.get();
 			UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
 					.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 
+			// Retrieve user details
+			UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
 			response.put("Authorities", userDetails.getAuthorities());
 			response.put("Details", userresponse);
 			return ResponseEntity.ok(response);
@@ -64,9 +64,9 @@ public class AdminService {
 			response.put("Error", HttpStatus.NO_CONTENT);
 			return ResponseEntity.internalServerError().body(response);
 		}
-		}catch (Exception e) {
+		}catch (SignatureException e) {
 			e.printStackTrace();
-			throw new NoSuchElementException("User Id is invalid Pleas check the ID");
+			throw new SignatureException("Token is invalid");
 		}
 	}
 
