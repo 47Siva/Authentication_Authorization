@@ -12,11 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.app.Authentication.Authorization.advice.MalformedJwtException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.UserStatus;
 import com.app.Authentication.Authorization.repository.UserRepository;
-import com.app.Authentication.Authorization.request.UserRegisterRequest;
 import com.app.Authentication.Authorization.response.UserResponse;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.util.PasswordUtil;
@@ -77,65 +77,54 @@ public class UserService implements UserDetailsService {
 				user.getAuthorities());
 	}
 
-	public ResponseEntity<?> getuserDetails(String username, String auth) {
-		String token = jwtService.extractToken(auth);
-		if (token == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token not provided");
-		}
-		// Validate token
-		if (!jwtService.validateToken(token)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-		}
-		Optional<User> userdetails = userRepository.findByUserName(username);
-		// Retrieve user details
-		UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
-		Optional<User> details = userRepository.findById(userdetails.get().getId());
-		// Construct response
-		Map<String, Object> response = new HashMap<>();
-		if (details.isPresent()) {
-			User user = details.get();
-			UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
-					.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
+	public ResponseEntity<?> getuserDetailsUserNameFromToken(String username, String auth) {
+		try {
+			String token = jwtService.extractToken(auth);
+			// Validate token
+			if (!jwtService.validateToken(token)) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+			}
+			Optional<User> userdetails = userRepository.findByUserName(username);
+			// Retrieve user details
+			UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
+			Optional<User> details = userRepository.findById(userdetails.get().getId());
+			
+			// Construct response
+			Map<String, Object> response = new HashMap<>();
+			if(!details.get().getRole().equals(Role.USER)) {
+				response.put("Status",HttpStatus.NOT_ACCEPTABLE.toString());
+				response.put("message", "User can't access the request");
+				response.put("Error", HttpStatus.NOT_ACCEPTABLE);
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+			}else if (details.isPresent()) {
+				User user = details.get();
+				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 
-			response.put("Authorities", userDetails.getAuthorities());
-			response.put("Details", userresponse);
-			return ResponseEntity.ok(response);
-		} else {
-			response.put("Status", HttpStatus.NO_CONTENT.toString());
-			response.put("message", "User id is invalid pleas check the ID");
-			response.put("Error", HttpStatus.NO_CONTENT);
-			return ResponseEntity.internalServerError().body(response);
+				response.put("Authorities", userDetails.getAuthorities());
+				response.put("Details", userresponse);
+				return ResponseEntity.ok(response);
+			}else {
+				response.put("Status", HttpStatus.NO_CONTENT.toString());
+				response.put("message", "User id is invalid pleas check the ID");
+				response.put("Error", HttpStatus.NO_CONTENT);
+				return ResponseEntity.internalServerError().body(response);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new MalformedJwtException("Token is invalid");
 		}
 	}
 
-	public ResponseEntity<?> getUserDetails(String username, String auth) {
-		
-		if (auth == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token not provided");
-		}
-		
-		String token = jwtService.extractToken(auth);
-		if (!jwtService.validateToken(token)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-		}
-		
-//		UUID authenticatedUserId = jwtService.getUserIdFromToken(token);
-//		UUID userID = UUID.fromString(authenticatedUserId);
-		
-		String authenticatedUserName = jwtService.getUsernameFromToken(token);
-
-		if (authenticatedUserName != null && authenticatedUserName.equals(username)) {
-			Optional<User> details = userRepository.findByUserName(authenticatedUserName);
+	public ResponseEntity<?> getuserdetials(String username) {
+		Optional<User> details = userRepository.findByUserName(username);
+		if (details.isPresent()) {
 			User user = details.get();
-			UserResponse response = UserResponse.builder()
-					                 .email(user.getEmail())
-					                 .userName(user.getUsername())
-					                 .mobileNo(user.getMobileNo())
-					                 .status(user.getStatus()).build();
+			UserResponse response = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
+					.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 			return ResponseEntity.ok(response);
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
 		}
-
 	}
 }
