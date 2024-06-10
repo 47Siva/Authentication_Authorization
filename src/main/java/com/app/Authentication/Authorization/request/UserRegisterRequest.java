@@ -1,5 +1,9 @@
 package com.app.Authentication.Authorization.request;
 
+import com.app.Authentication.Authorization.Deserializer.RoleEnumDeserializer;
+import com.app.Authentication.Authorization.enumeration.Role;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +22,8 @@ public class UserRegisterRequest {
 	private String mobileNo;
 	
 	private String password;
+	
+	@JsonDeserialize(using = RoleEnumDeserializer.class)
+	private Role role;
 	
 }

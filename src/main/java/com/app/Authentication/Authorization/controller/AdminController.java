@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.app.Authentication.Authorization.response.ResponseGenerator;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.service.AdminService;
+import com.app.Authentication.Authorization.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,9 +30,18 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final JwtService jwtService;
 	private final AdminService adminService;
+	private final UserService userService;
 	private final ResponseGenerator responseGenerator;
 	
-	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Id api", responses = {
+	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get All User Can see Admin Only", responses = {
+			@ApiResponse(description = "Success", responseCode = "200"),
+			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String auth) {
+        return userService.getAllUsers(auth);
+    }
+	
+	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Name api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@GetMapping(value = "/getUser/{username}", produces = "application/json")

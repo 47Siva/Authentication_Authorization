@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.app.Authentication.Authorization.enumeration.GenderType;
+import com.app.Authentication.Authorization.enumeration.Role;
 
 public class ValidationUtil {
 
@@ -94,6 +95,10 @@ public class ValidationUtil {
 	public static boolean isGenderrequired(GenderType gender) {
 		return gender == null;
 	}
+	
+	public static boolean isRolerequired(Role role) {
+		return role == null;
+	}
 
 	public static boolean isGenderValid(GenderType gender) {
 		String genderTypetoString = gender.toString();
@@ -101,19 +106,24 @@ public class ValidationUtil {
 				|| genderTypetoString.equalsIgnoreCase("other");
 	}
 	
+	public static boolean isRoleValid(Role role) {
+		String roleTypetoString = role.toString();
+		return roleTypetoString.equalsIgnoreCase("admin") || roleTypetoString.equalsIgnoreCase("user");
+	}
+
 	public static boolean isValidPassword(String password) {
-		if(password == null) {
+		if (password == null) {
 			return false;
 		}
-		
+
 		String passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$";
-		
+
 		if (!Pattern.matches(passwordRegex, password)) {
 			return false;
 		}
-		
+
 		boolean hasSpecialChar = password.contains("@");
-		
+
 		return hasSpecialChar;
 	}
 
@@ -185,28 +195,28 @@ public class ValidationUtil {
 	public static boolean isAgerequired(String age) {
 		return age == null || age.isEmpty();
 	}
-	
+
 	public static int calculateAge(String dob) {
-	    LocalDate today = LocalDate.now();
-	    final String DATE_PATTERN = "dd-MM-yyyy";
+		LocalDate today = LocalDate.now();
+		final String DATE_PATTERN = "dd-MM-yyyy";
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
 		LocalDate date = LocalDate.parse(dob, formatter);
-	    return Period.between(date, today).getYears();
+		return Period.between(date, today).getYears();
 	}
-	
-	public static boolean isDateOfBirthAgeMatcher(String dob , String reportedAge) {
+
+	public static boolean isDateOfBirthAgeMatcher(String dob, String reportedAge) {
 		int calculatedAge = calculateAge(dob);
 		int age = Integer.parseInt(reportedAge);
 		return calculatedAge == age;
 	}
 
 	public static boolean isEighteenOrOlder(String birthDate, String reportedAge) {
-		
-	    int calculatedAge = calculateAge(birthDate);
-	    
-	    int age = Integer.parseInt(reportedAge);
-	    
-	    return calculatedAge >= 18 && age > 18;
+
+		int calculatedAge = calculateAge(birthDate);
+
+		int age = Integer.parseInt(reportedAge);
+
+		return calculatedAge >= 18 && age > 18;
 	}
 
 	public static String getformatDate(String date) {
@@ -223,6 +233,16 @@ public class ValidationUtil {
 			return GenderType.FEMALE;
 		case OTHER:
 			return GenderType.OTHER;
+		}
+		return null;
+	}
+
+	public static Role getFormattedRole(Role role) {
+		switch (role) {
+		case USER:
+			return Role.USER;
+		case ADMIN:
+			return Role.ADMIN;
 		}
 		return null;
 	}

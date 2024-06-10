@@ -19,7 +19,6 @@ import com.app.Authentication.Authorization.response.UserResponse;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.util.PasswordUtil;
 
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,18 +37,19 @@ public class AdminService {
 	}
 
 	public ResponseEntity<?> getadmindetials(String username, String auth) {
-		try {
+
 		String token = jwtService.extractToken(auth);
+		// Construct response
+		Map<String, Object> response = new HashMap<>();
 		// Validate token
 		if (!jwtService.validateToken(token)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 		}
 		Optional<User> userdetails = userRepository.findByUserName(username);
-		
-		// Construct response
-		Map<String, Object> response = new HashMap<>();
+
 		if (userdetails.isPresent()) {
 			User user = userdetails.get();
+
 			UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
 					.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 
@@ -58,15 +58,11 @@ public class AdminService {
 			response.put("Authorities", userDetails.getAuthorities());
 			response.put("Details", userresponse);
 			return ResponseEntity.ok(response);
-		}else {
+		} else {
 			response.put("Status", HttpStatus.NO_CONTENT.toString());
 			response.put("message", "User id is invalid pleas check the ID");
 			response.put("Error", HttpStatus.NO_CONTENT);
 			return ResponseEntity.internalServerError().body(response);
-		}
-		}catch (SignatureException e) {
-			e.printStackTrace();
-			throw new SignatureException("Token is invalid");
 		}
 	}
 

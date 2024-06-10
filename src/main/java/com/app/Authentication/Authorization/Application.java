@@ -22,4 +22,6 @@ public class Application {
 		messageSource.setCacheSeconds(10); //reload messages every 10 seconds
 		return messageSource;
 	}
+	
+	
 }

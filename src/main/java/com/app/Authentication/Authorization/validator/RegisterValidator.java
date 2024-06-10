@@ -71,6 +71,15 @@ public class RegisterValidator {
 				errors.add(messageService.messageResponse("register.password.invalid"));
 			}
 		}
+		
+		if(ValidationUtil.isRolerequired(request.getRole())) {
+			errors.add(messageService.messageResponse("register.role.required"));
+		}else {
+			request.setRole(ValidationUtil.getFormattedRole(request.getRole()));
+			if(!ValidationUtil.isRoleValid(request.getRole())) {
+				errors.add(messageService.messageResponse("register.role.invalid"));
+			}
+		}
 
 		Optional<User> userDuplicateMailObj = userService.findByDuplicateEmail(request.getEmail());
 		if (userDuplicateMailObj.isPresent()) {
@@ -102,7 +111,7 @@ public class RegisterValidator {
 		}
 
 		user = User.builder().email(request.getEmail()).mobileNo(request.getMobileNo()).password(request.getPassword())
-				.userName(request.getUserName()).build();
+				.userName(request.getUserName()).role(request.getRole()).build();
 
 		result.setObject(user);
 		return result;

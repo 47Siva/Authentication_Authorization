@@ -42,7 +42,7 @@ public class UserController {
 	private final ResponseGenerator responseGenerator;
 
 
-	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Id api", responses = {
+	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Name api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@GetMapping(value = "/getUser/{username}", produces = "application/json")

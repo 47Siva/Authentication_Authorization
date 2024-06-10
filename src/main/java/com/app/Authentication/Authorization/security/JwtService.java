@@ -5,10 +5,13 @@ import static com.app.Authentication.Authorization.util.Constants.ACCESS_TOKEN_V
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +48,15 @@ public class JwtService {
 	}
 
 	public String generateToken(User userDetails) {
-		return generateToken(Map.of(), userDetails);
+//		return generateToken(Map.of(), userDetails);
+		Map<String, Object> claims = new HashMap();
+		claims.put("role", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.collect(Collectors.joining(",")));
+		return createToken(claims, userDetails.getUsername());
 	}
 
-	public String generateToken(Map<String, Object> extraClaim, User userDetails) {
-		return Jwts.builder().setClaims(extraClaim).setSubject(userDetails.getUsername())
+	public String createToken(Map<String, Object> extraClaim, String userDetails) {
+		return Jwts.builder().setClaims(extraClaim).setSubject(userDetails)
 				.setIssuer("http://ebraintechnologies.com").setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS))
 				.signWith(getSigninKey(), SignatureAlgorithm.HS256).compact();
@@ -117,11 +124,12 @@ public class JwtService {
 		}
 	}
 
-	public  String getUsernameFromToken(String token) {
-        Jws<Claims> jwsClaims = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .build()
-                .parseClaimsJws(token);
-        return jwsClaims.getBody().getSubject();
-    }
+	public String getUsernameFromToken(String token) {
+		Jws<Claims> jwsClaims = Jwts.parserBuilder().setSigningKey(SECRET_KEY.getBytes()).build().parseClaimsJws(token);
+		return jwsClaims.getBody().getSubject();
+	}
+
+	public String extractRole(String token) {
+		return extractClaim(token, claims -> claims.get("role", String.class));
+	}
 }

@@ -14,13 +14,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.app.Authentication.Authorization.response.Response;
 import com.app.Authentication.Authorization.response.Error;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 	protected ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -78,6 +79,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 	}
 	
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<Object> handleNullPointerException(NullPointerException ex){
+		Error errors = new Error();
+		errors.setErrorList((Stream.of(ex.getMessage().split(",")).collect(Collectors.toList())));
+		errors.setReason(ex.getMessage());
+		errors.setCode(HttpStatus.CONFLICT.toString());
+		Response response = new Response();
+		response.setError(errors);
+		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	}
+	
 	@ExceptionHandler(MalformedJwtException.class)
 	public ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex){
 		Error errors = new Error();
@@ -95,11 +108,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		Error errors = new Error();
 		errors.setErrorList((Stream.of(ex.getMessage().split(",")).collect(Collectors.toList())));
 		errors.setReason(ex.getMessage());
-		errors.setCode(HttpStatus.BAD_REQUEST.toString());
+		errors.setCode(HttpStatus.UNAUTHORIZED.toString());
 		Response response = new Response();
 		response.setError(errors);
 		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	}
+	
+	 @ExceptionHandler(HttpMessageNotReadableException.class)
+	    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request) {
+	        String errorMessage = "Invalid request payload. Please check the JSON format and field types.";
+	        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+	 }
 
 }

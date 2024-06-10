@@ -1,33 +1,47 @@
 package com.app.Authentication.Authorization.security;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.app.Authentication.Authorization.service.UserService;
-import com.app.Authentication.Authorization.util.PasswordUtil;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true) // Enables method level security
 public class  SecurityConfiguration {
-    private final JwtAuthenticationFilter jwtAuthFilter;
+   
     private final AuthenticationProvider authenticationProvider;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
     
+//    @Qualifier("HandlerExceptionResolver")
+    private HandlerExceptionResolver exceptionResolver;
+    
+    @Autowired
+    public SecurityConfiguration(AuthenticationProvider authenticationProvider, JwtService jwtService,
+                                 UserDetailsService userDetailsService, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
+        this.authenticationProvider = authenticationProvider;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.exceptionResolver = exceptionResolver;
+    }
+    
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, userDetailsService, exceptionResolver);
+    }
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,7 +65,7 @@ public class  SecurityConfiguration {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
     }
@@ -61,7 +75,7 @@ public class  SecurityConfiguration {
         http
         	.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth ->
-                auth.requestMatchers("api/user/**").permitAll() // Allow access to public endpoints
+                auth.requestMatchers("api/user/**").hasAnyRole("USER","ADMIN") // Allow access to public endpoints
                 .requestMatchers("api/admin/**").hasRole("ADMIN") // Require ADMIN role for /admin endpoints
                 .anyRequest().authenticated()) // Require authentication for any other endpoint
             
