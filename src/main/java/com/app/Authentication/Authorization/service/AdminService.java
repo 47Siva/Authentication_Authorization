@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.app.Authentication.Authorization.advice.NoSuchElementException;
 import com.app.Authentication.Authorization.advice.SignatureException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
@@ -38,31 +37,34 @@ public class AdminService {
 
 	public ResponseEntity<?> getadmindetials(String username, String auth) {
 
-		String token = jwtService.extractToken(auth);
-		// Construct response
-		Map<String, Object> response = new HashMap<>();
-		// Validate token
-		if (!jwtService.validateToken(token)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-		}
-		Optional<User> userdetails = userRepository.findByUserName(username);
+		try {
+			String token = jwtService.extractToken(auth);
+			// Construct response
+			Map<String, Object> response = new HashMap<>();
+			// Validate token
+			if (!jwtService.validateToken(token)) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+			}
+			Optional<User> userdetails = userRepository.findByUserName(username);
+			if (userdetails.isPresent()) {
+				User user = userdetails.get();
+				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
 
-		if (userdetails.isPresent()) {
-			User user = userdetails.get();
-
-			UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
-					.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
-
-			// Retrieve user details
-			UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
-			response.put("Authorities", userDetails.getAuthorities());
-			response.put("Details", userresponse);
-			return ResponseEntity.ok(response);
-		} else {
-			response.put("Status", HttpStatus.NO_CONTENT.toString());
-			response.put("message", "User id is invalid pleas check the ID");
-			response.put("Error", HttpStatus.NO_CONTENT);
-			return ResponseEntity.internalServerError().body(response);
+				// Retrieve user details
+				UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
+				response.put("Authorities", userDetails.getAuthorities());
+				response.put("Details", userresponse);
+				return ResponseEntity.ok(response);
+			} else {
+				response.put("Status", HttpStatus.NO_CONTENT.toString());
+				response.put("message", "User id is invalid pleas check the ID");
+				response.put("Error", HttpStatus.NO_CONTENT);
+				return ResponseEntity.internalServerError().body(response);
+			}
+		} catch (SignatureException e) {
+			e.printStackTrace();
+			throw new SignatureException("Token is invalid");
 		}
 	}
 

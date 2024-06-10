@@ -86,6 +86,7 @@ public class UserService implements UserDetailsService {
 				user.getAuthorities());
 	}
 
+
 	@PreAuthorize("hasAnyRole('USER','ADMIN')")
 	public ResponseEntity<?> getAllUsers(String auth) throws SignatureException {
 		Map<String, Object> response = new HashMap<>();
