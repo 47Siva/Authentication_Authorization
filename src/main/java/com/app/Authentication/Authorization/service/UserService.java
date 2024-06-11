@@ -20,11 +20,13 @@ import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.UserStatus;
 import com.app.Authentication.Authorization.repository.UserRepository;
+import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.UserMapper;
 import com.app.Authentication.Authorization.response.UserResponse;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.util.PasswordUtil;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,6 +35,7 @@ public class UserService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final JwtService jwtService;
+	private @NonNull MessageService messagePropertySource;
 
 	public User createUser(User user) {
 		if (user == null) {
@@ -86,7 +89,6 @@ public class UserService implements UserDetailsService {
 				user.getAuthorities());
 	}
 
-
 	@PreAuthorize("hasAnyRole('USER','ADMIN')")
 	public ResponseEntity<?> getAllUsers(String auth) throws SignatureException {
 		Map<String, Object> response = new HashMap<>();
@@ -125,34 +127,26 @@ public class UserService implements UserDetailsService {
 
 		Optional<User> userdetails = userRepository.findByUserName(username);
 		if (username.equals(tokenusername)) {
-			String tokenRole = jwtService.extractRole(token);
-			if (userdetails.get().getRole().equals(tokenRole)) {
-				if (userdetails.isPresent()) {
-					User user = userdetails.get();
+			if (userdetails.isPresent()) {
+				User user = userdetails.get();
 
-					if (!user.getRole().equals(Role.USER)) {
-						response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
-						response.put("message", "User can't access the request");
-						response.put("Error", HttpStatus.NOT_ACCEPTABLE);
-						return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
-					}
-					UserResponse userresponse = UserResponse.builder().email(user.getEmail())
-							.userName(user.getUsername()).mobileNo(user.getMobileNo()).status(user.getStatus()).build();
-
-					// Retrieve user details
-					UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
-					response.put("Authorities", userDetails.getAuthorities());
-					response.put("Details", userresponse);
-					return ResponseEntity.ok(response);
-				} else {
-					response.put("Status", HttpStatus.BAD_REQUEST.toString());
-					response.put("message", "User name is invalid pleas check the Name");
-					response.put("Error", HttpStatus.BAD_REQUEST);
-					return ResponseEntity.badRequest().body(response);
+				if (!user.getRole().equals(Role.USER)) {
+					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
+					response.put("message", "User can't access the request");
+					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 				}
-			}else {
+				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
+
+				// Retrieve user details
+				UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
+				response.put("Authorities", userDetails.getAuthorities());
+				response.put("Details", userresponse);
+				return ResponseEntity.ok(response);
+			} else {
 				response.put("Status", HttpStatus.BAD_REQUEST.toString());
-				response.put("message", "User Role Mismatch the Token .Place Enter the Valid Data");
+				response.put("message", messagePropertySource.messageResponse("user.notfound"));
 				response.put("Error", HttpStatus.BAD_REQUEST);
 				return ResponseEntity.badRequest().body(response);
 			}
@@ -163,6 +157,7 @@ public class UserService implements UserDetailsService {
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
+
 
 	public ResponseEntity<?> getuserdetials(String username) {
 		Optional<User> details = userRepository.findByUserName(username);
@@ -175,4 +170,15 @@ public class UserService implements UserDetailsService {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
 		}
 	}
+
+	public void saveOrUpdate(User userObject) {
+		userRepository.saveAndFlush(userObject);
+
+	}
+
+	public ResponseEntity<?> deleteUser(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

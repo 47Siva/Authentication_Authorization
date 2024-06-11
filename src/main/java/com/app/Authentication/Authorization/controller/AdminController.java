@@ -36,7 +36,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get All User Can see Admin Only", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-    @GetMapping("/users")
+    @GetMapping("/getAllusers")
     public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String auth) {
         return userService.getAllUsers(auth);
     }
