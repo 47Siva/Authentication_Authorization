@@ -77,6 +77,19 @@ public class UserService implements UserDetailsService {
 	public Optional<User> findByUserId(UUID id) {
 		return userRepository.findById(id);
 	}
+	
+	public void saveOrUpdate(User userObject) {
+		userRepository.saveAndFlush(userObject);
+	}
+
+	public Optional<User> getByMobileNo(String mobileNo) {
+		return userRepository.getByMobileNo(mobileNo);
+	}
+
+
+	public Optional<User> findByUserEmail(String email) {
+		return userRepository.findByUserEmail(email);
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -171,14 +184,8 @@ public class UserService implements UserDetailsService {
 		}
 	}
 
-	public void saveOrUpdate(User userObject) {
-		userRepository.saveAndFlush(userObject);
-
-	}
-
-	public ResponseEntity<?> deleteUser(String username) {
-		// TODO Auto-generated method stub
-		return null;
+	public Optional<User> findById(UUID userId) {
+		return userRepository.findById(userId);
 	}
 
 }

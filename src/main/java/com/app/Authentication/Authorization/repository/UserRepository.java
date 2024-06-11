@@ -26,4 +26,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	
 	@Query(value = "SELECT * FROM user_details where password =:password ", nativeQuery = true)
 	Optional<User> findByDuplicatePassword(String password);
+
+	@Query(value = "select * from user_details where mobile_no =:mobileNo ", nativeQuery = true)
+	Optional<User> getByMobileNo(String mobileNo);
+
+	@Query(value = "select * from user_details where email ", nativeQuery = true)
+	Optional<User> findByUserEmail(String email);
 }

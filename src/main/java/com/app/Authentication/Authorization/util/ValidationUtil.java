@@ -247,4 +247,8 @@ public class ValidationUtil {
 		return null;
 	}
 
+	public static boolean isNullObject(Role value) {
+		return null == value;
+	}
+
 }

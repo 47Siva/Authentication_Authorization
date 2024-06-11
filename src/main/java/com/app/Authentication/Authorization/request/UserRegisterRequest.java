@@ -1,5 +1,7 @@
 package com.app.Authentication.Authorization.request;
 
+import java.util.UUID;
+
 import com.app.Authentication.Authorization.Deserializer.RoleEnumDeserializer;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -15,6 +17,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserRegisterRequest {
 
+	private UUID userId;
+	
 	private String userName;
 	
 	private String  email;
