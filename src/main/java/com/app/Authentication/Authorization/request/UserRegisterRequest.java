@@ -27,7 +27,9 @@ public class UserRegisterRequest {
 	
 	private String password;
 	
+	private String confirmPassword; 
+	
 	@JsonDeserialize(using = RoleEnumDeserializer.class)
-	private Role role;
+	private Role userRole;
 	
 }

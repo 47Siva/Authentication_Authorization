@@ -72,11 +72,11 @@ public class RegisterValidator {
 			}
 		}
 		
-		if(ValidationUtil.isRolerequired(request.getRole())) {
+		if(ValidationUtil.isRolerequired(request.getUserRole())) {
 			errors.add(messageService.messageResponse("register.role.required"));
 		}else {
-			request.setRole(ValidationUtil.getFormattedRole(request.getRole()));
-			if(!ValidationUtil.isRoleValid(request.getRole())) {
+			request.setUserRole(ValidationUtil.getFormattedRole(request.getUserRole()));
+			if(!ValidationUtil.isRoleValid(request.getUserRole())) {
 				errors.add(messageService.messageResponse("register.role.invalid"));
 			}
 		}
@@ -111,7 +111,7 @@ public class RegisterValidator {
 		}
 
 		user = User.builder().email(request.getEmail()).mobileNo(request.getMobileNo()).password(request.getPassword())
-				.userName(request.getUserName()).role(request.getRole()).build();
+				.userName(request.getUserName()).userRole(request.getUserRole()).build();
 
 		result.setObject(user);
 		return result;

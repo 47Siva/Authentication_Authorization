@@ -1,7 +1,6 @@
 package com.app.Authentication.Authorization.response;
 
-import com.app.Authentication.Authorization.enumeration.UserStatus;
-import com.app.Authentication.Authorization.request.UserRegisterRequest;
+import com.app.Authentication.Authorization.enumeration.Status;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,5 +19,5 @@ public class UserResponse {
 
 	private String mobileNo;
 	
-	private UserStatus	status;
+	private Status	status;
 }
