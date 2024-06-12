@@ -4,7 +4,6 @@ package com.app.Authentication.Authorization.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.RequestType;
-import com.app.Authentication.Authorization.enumeration.UserStatus;
+import com.app.Authentication.Authorization.enumeration.Status;
 import com.app.Authentication.Authorization.request.UserRegisterRequest;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.ResponseGenerator;
@@ -29,6 +28,7 @@ import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.service.UserService;
 import com.app.Authentication.Authorization.util.ResponseMessage;
 import com.app.Authentication.Authorization.validator.RegisterValidator;
+import com.app.Authentication.Authorization.validator.UserValidator;
 import com.app.Authentication.Authorization.validator.ValidationResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +48,7 @@ public class UserController {
 	
 	private final JwtService jwtService;
 	private final UserService userService;
-	private final RegisterValidator registerValidator;
+	private final UserValidator userValidator;
 	private final ResponseGenerator responseGenerator;
 	private @NonNull MessageService messagePropertySource;
 
@@ -70,7 +70,7 @@ public class UserController {
 	        @RequestBody UserRegisterRequest request,
 			@RequestHeader HttpHeaders httpHeader) throws Exception {
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeader);
-		ValidationResult validationResult = registerValidator.validate(RequestType.PUT, request);
+		ValidationResult validationResult = userValidator.validate(RequestType.PUT, request);
 		userService.saveOrUpdate((User) validationResult.getObject());
 		try {
 			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.update"), HttpStatus.OK);
@@ -95,7 +95,7 @@ public class UserController {
 				return responseGenerator.errorResponse(context, ResponseMessage.INVALID_OBJECT_REFERENCE,
 						HttpStatus.BAD_REQUEST);
 			}
-			userObject.setStatus(UserStatus.INACTIVE);
+			userObject.setStatus(Status.INACTIVE);
 			userService.saveOrUpdate(userObject);
 
 			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.delete"),

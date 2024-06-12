@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import com.app.Authentication.Authorization.advice.SignatureException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
-import com.app.Authentication.Authorization.enumeration.UserStatus;
+import com.app.Authentication.Authorization.enumeration.Status;
 import com.app.Authentication.Authorization.repository.UserRepository;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.UserMapper;
@@ -41,12 +41,12 @@ public class UserService implements UserDetailsService {
 		if (user == null) {
 			throw new IllegalArgumentException("User cannot be null");
 		}
-		if (user.getRole() == null) {
+		if (user.getUserRole() == null) {
 			throw new IllegalArgumentException("Role cannot be null");
 		}
 		var userobj = User.builder().email(user.getEmail()).mobileNo(user.getMobileNo())
-				.password(PasswordUtil.getEncryptedPassword(user.getPassword())).role(user.getRole())
-				.status(UserStatus.ACTIVE).userName(user.getUsername()).build();
+				.password(PasswordUtil.getEncryptedPassword(user.getPassword())).userRole(user.getUserRole())
+				.status(Status.ACTIVE).userName(user.getUsername()).build();
 		return userRepository.saveAndFlush(userobj);
 	}
 
@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService {
 			if (userdetails.isPresent()) {
 				User user = userdetails.get();
 
-				if (!user.getRole().equals(Role.USER)) {
+				if (!user.getUserRole().equals(Role.USER)) {
 					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
 					response.put("message", "User can't access the request");
 					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
@@ -186,6 +186,10 @@ public class UserService implements UserDetailsService {
 
 	public Optional<User> findById(UUID userId) {
 		return userRepository.findById(userId);
+	}
+
+	public Optional<User> findByUserRoleType(String admin) {
+		return userRepository.findByUserRoleType(admin);
 	}
 
 }

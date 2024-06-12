@@ -12,14 +12,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.app.Authentication.Authorization.auditing.AuditwithBaseEntity;
 import com.app.Authentication.Authorization.enumeration.Role;
-import com.app.Authentication.Authorization.enumeration.UserStatus;
+import com.app.Authentication.Authorization.enumeration.Status;
 import com.app.Authentication.Authorization.util.PasswordUtil;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,15 +55,17 @@ public class User extends AuditwithBaseEntity implements UserDetails, Serializab
 	private String mobileNo;
 
 	@Column(name = "password")
+	@NotNull(message = "Password")
 	private String password;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role")
-	private Role role;
+	private Role userRole;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	private UserStatus	status;
+	private Status	status;
+	
 
 	public void setAndEncryptPassword(String password) {
 		setPassword(PasswordUtil.getEncryptedPassword(password));
@@ -68,7 +73,7 @@ public class User extends AuditwithBaseEntity implements UserDetails, Serializab
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(role.name()));
+		return List.of(new SimpleGrantedAuthority(userRole.name()));
 	}
 
 	@Override

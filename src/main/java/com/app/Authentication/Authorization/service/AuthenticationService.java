@@ -76,7 +76,7 @@ public class AuthenticationService {
 		response.put("jwt", token);
 		response.put("userId", user.getId());
 		response.put("userName", user.getUsername());
-		response.put("role", user.getRole());
+		response.put("role", user.getUserRole());
 
 		return ResponseEntity.ok().body(response);
 	}

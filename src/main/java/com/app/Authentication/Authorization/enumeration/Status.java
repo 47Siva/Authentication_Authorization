@@ -1,5 +1,5 @@
 package com.app.Authentication.Authorization.enumeration;
 
-public enum UserStatus {
+public enum Status {
 	ACTIVE, INACTIVE,PENDING
 }
