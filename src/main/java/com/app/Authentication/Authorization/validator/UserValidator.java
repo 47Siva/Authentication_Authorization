@@ -39,6 +39,9 @@ public class UserValidator {
 		errors = new ArrayList<>();
 		ValidationResult result = new ValidationResult();
 		User user = null;
+		
+		Optional<User> userOptional = userService.findById(request.getUserId());
+		user = userOptional.get();
 
 		if (requestType.equals(RequestType.PUT)) {
 			if (ValidationUtil.isNull(request.getUserId())) {
@@ -52,8 +55,8 @@ public class UserValidator {
 					errors.add(messageSource.messageResponse("register.user.name.invalid"));
 				}
 			}
-			Optional<User> userOptional = userService.getByMobileNo(request.getMobileNo());
-			if (userOptional.isPresent()) {
+			Optional<User> findmobile = userService.getByMobileNo(request.getMobileNo());
+			if (findmobile.isPresent()) {
 				String[] params = new String[] { request.getMobileNo() };
 				errors.add(messageSource.messageResponse("register.mobileno.exist", params));
 			}
@@ -67,14 +70,15 @@ public class UserValidator {
 			if (userDuplicateMailObj.isPresent()) {
 				errors.add(messageSource.messageResponse("user.register.email.duplicate"));
 			}
-		} else {
+		}
+		
+		else {
 			if (!ValidationUtil.isNull(request.getUserId()))
 				throw new ObjectInvalidException(messageSource.messageResponse("invalid.request.payload"));
-			Optional<User> userOptional = userService.findById(request.getUserId());
 			if (!userOptional.isPresent()) {
 				throw new ObjectInvalidException(messageSource.messageResponse("user.not.found"));
 			}
-			user = userOptional.get();
+			
 		}
 		if (ValidationUtil.isNullOrEmpty(request.getUserName())) {
 			errors.add(messageSource.messageResponse("register.user.name.required"));
@@ -119,7 +123,7 @@ public class UserValidator {
 		}
 		if (null == user) {
 			String admin="ADMIN";
-			Optional<User> userOption=userService.findByUserRoleType(admin);
+			Optional<User> findbyrole=userService.findByUserRoleType(admin);
 		
 			
 			user = User.builder().userName(request.getUserName())
