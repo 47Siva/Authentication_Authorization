@@ -65,13 +65,28 @@ public class RegisterValidator {
 
 		if (ValidationUtil.isNullOrEmpty(request.getPassword())) {
 			errors.add(messageService.messageResponse("register.password.required"));
-		} else {
+		}else if(ValidationUtil.isNullOrEmpty(request.getConfirmPassword())) {
+			errors.add(messageService.messageResponse("register.confirmPassword.required"));
+		}
+		else {
 			request.setPassword(ValidationUtil.getFormattedString(request.getPassword()));
 			if (!ValidationUtil.isValidPassword(request.getPassword())) {
 				errors.add(messageService.messageResponse("register.password.invalid"));
 			}
+			if (!request.getPassword().equals(request.getConfirmPassword())) {
+				errors.add(messageService.messageResponse("password.mismatch"));
+			}
 		}
 		
+
+		String role = request.getUserRole().toString();
+		
+		if(role.equals("ADMIN")) {
+			Optional<User> userDuplicateRole = userService.findByUserRoleType(role);
+			if(userDuplicateRole.isPresent()) {
+				errors.add(messageService.messageResponse("register.role.present"));
+			}
+		}
 		if(ValidationUtil.isRolerequired(request.getUserRole())) {
 			errors.add(messageService.messageResponse("register.role.required"));
 		}else {
@@ -79,6 +94,7 @@ public class RegisterValidator {
 			if(!ValidationUtil.isRoleValid(request.getUserRole())) {
 				errors.add(messageService.messageResponse("register.role.invalid"));
 			}
+			
 		}
 
 		Optional<User> userDuplicateMailObj = userService.findByDuplicateEmail(request.getEmail());

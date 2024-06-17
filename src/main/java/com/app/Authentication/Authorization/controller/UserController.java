@@ -68,9 +68,10 @@ public class UserController {
 	@PutMapping(value = "/update",  produces = "application/json")
 	public ResponseEntity<?> update(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload")
 	        @RequestBody UserRegisterRequest request,
-			@RequestHeader HttpHeaders httpHeader) throws Exception {
+			@RequestHeader HttpHeaders httpHeader,
+			@RequestHeader ("Authorization")String auth) throws Exception {
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeader);
-		ValidationResult validationResult = userValidator.validate(RequestType.PUT, request);
+		ValidationResult validationResult = userValidator.validate(RequestType.PUT, request,auth);
 		userService.saveOrUpdate((User) validationResult.getObject());
 		try {
 			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.update"), HttpStatus.OK);
