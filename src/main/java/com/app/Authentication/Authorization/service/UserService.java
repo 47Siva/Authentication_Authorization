@@ -102,7 +102,7 @@ public class UserService implements UserDetailsService {
 				user.getAuthorities());
 	}
 
-	@PreAuthorize("hasAnyRole('USER','ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')" )
 	public ResponseEntity<?> getAllUsers(String auth) throws SignatureException {
 		Map<String, Object> response = new HashMap<>();
 		String token = jwtService.extractToken(auth);
@@ -190,6 +190,10 @@ public class UserService implements UserDetailsService {
 
 	public Optional<User> findByUserRoleType(String admin) {
 		return userRepository.findByUserRoleType(admin);
+	}
+
+	public void deleteUser(User userObject) {
+		userRepository.delete(userObject);
 	}
 
 }

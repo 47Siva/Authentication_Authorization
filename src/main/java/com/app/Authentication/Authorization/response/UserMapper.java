@@ -9,7 +9,8 @@ public class UserMapper {
             user.getUsername(),
             user.getEmail(),
             user.getMobileNo(),
-            user.getStatus()
+            user.getStatus(),
+            user.getUserRole()
         );
     }
 }

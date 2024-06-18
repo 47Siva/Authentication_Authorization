@@ -1,5 +1,6 @@
 package com.app.Authentication.Authorization.response;
 
+import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.Status;
 
 import lombok.AllArgsConstructor;
@@ -20,4 +21,6 @@ public class UserResponse {
 	private String mobileNo;
 	
 	private Status	status;
+	
+	private Role userRole;
 }
