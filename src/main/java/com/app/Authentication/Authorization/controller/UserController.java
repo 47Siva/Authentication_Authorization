@@ -96,8 +96,9 @@ public class UserController {
 				return responseGenerator.errorResponse(context, ResponseMessage.INVALID_OBJECT_REFERENCE,
 						HttpStatus.BAD_REQUEST);
 			}
-			userObject.setStatus(Status.INACTIVE);
-			userService.saveOrUpdate(userObject);
+//			userObject.setStatus(Status.INACTIVE);
+//			userService.saveOrUpdate(userObject);
+			userService.deleteUser(userObject);
 
 			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.delete"),
 					HttpStatus.OK);
