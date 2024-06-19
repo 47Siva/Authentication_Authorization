@@ -55,7 +55,7 @@ public class AuthenticationController {
 	private final AuthenticationService authenticationService;
 	private final UserRepository userRepository;
 	private final RegisterValidator registerValidator;
-	private final AdminValidator adminValidator;  
+	private final AdminValidator adminValidator;
 	private final ResponseGenerator responseGenerator;
 	private final AdminService adminService;
 
@@ -87,17 +87,16 @@ public class AuthenticationController {
 			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@Operation(description = "Post End Point", summary = "This is a Admin register api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@PostMapping(value = "/admin/register", produces = "application/json")
 	public ResponseEntity<?> adminRegister(@RequestBody AdminRegister register,
-			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Admin Signup request payload")
-			@RequestHeader HttpHeaders httpHeaders){
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Admin Signup request payload") @RequestHeader HttpHeaders httpHeaders) {
 		ValidationResult validationResult = adminValidator.validate(RequestType.POST, register);
 		User user = (User) validationResult.getObject();
-		
+
 		User adminservice = adminService.createAdmin(user);
 		Map<String, Object> response = new HashMap<>();
 		final String token = jwtService.generateToken(adminservice);
@@ -123,11 +122,14 @@ public class AuthenticationController {
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload") @RequestBody AuthenticationRequest request,
 			@RequestHeader HttpHeaders httpHeaders) {
 
-		ResponseEntity<?> authenticationservice = authenticationService.userlogin(request);
+		ResponseEntity<?> authenticationServiceResponse = authenticationService.userlogin(request);
 
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			return responseGenerator.successResponse(context, authenticationservice, HttpStatus.OK);
+			if (authenticationServiceResponse.getStatusCode() == HttpStatus.OK) {
+				return responseGenerator.successResponse(context, authenticationServiceResponse, HttpStatus.OK);
+			}
+			return authenticationServiceResponse;
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(), e);
@@ -135,7 +137,5 @@ public class AuthenticationController {
 		}
 
 	}
-	
-	
-	
+
 }
