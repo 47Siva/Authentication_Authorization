@@ -45,7 +45,7 @@ public class AuthenticationService {
 			errorDto.setMessage("Usernot found.!");
 			response.put("status", 0);
 			response.put("error", errorDto);
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 
 		User user = userOptional.get();
@@ -67,7 +67,7 @@ public class AuthenticationService {
 			response.put("Status", "0");
 			response.put("error", errorDto);
 
-			return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response); 
+			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); 
 		}
 
 		final String token = jwtService.generateToken(user);
