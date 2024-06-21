@@ -56,10 +56,10 @@ public class UserController {
 	@Operation(description = "Get End Point", summary = "Allows to fetch user by user name.", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping(value = "/getUser/{username}", produces = "application/json")
-	public ResponseEntity<?>getUser(@PathVariable ("username") String username ,@RequestHeader("Authorization") String auth){
+	@GetMapping(value = "/getUser/{useremail}", produces = "application/json")
+	public ResponseEntity<?>getUser(@PathVariable ("useremail") String useremail ,@RequestHeader("Authorization") String auth){
 		
-		 return userService.getuserDetailsUserNameFromToken(username , auth);
+		 return userService.getuserDetailsUserNameFromToken(useremail , auth);
 	}
 	
 	@Operation(description = "PUT End Point", summary = "Allows to update existing user.", responses = {
