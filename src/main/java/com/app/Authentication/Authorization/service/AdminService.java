@@ -49,7 +49,7 @@ public class AdminService {
 			if (userdetails.isPresent()) {
 				User user = userdetails.get();
 				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
-						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
 
 				// Retrieve user details
 				UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());

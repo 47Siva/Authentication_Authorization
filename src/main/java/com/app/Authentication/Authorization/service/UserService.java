@@ -150,7 +150,7 @@ public class UserService implements UserDetailsService {
 					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 				}
 				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
-						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
 
 				// Retrieve user details
 				UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
