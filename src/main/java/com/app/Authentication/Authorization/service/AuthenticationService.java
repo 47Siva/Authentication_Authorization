@@ -38,7 +38,7 @@ public class AuthenticationService {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Optional<User> userOptional = userRepository.findByUserName(request.getUserName());
+		Optional<User> userOptional = userRepository.findByUserEmail(request.getEmail());
 		if (!userOptional.isPresent()) {
 			errorDto = new ErrorDto();
 			errorDto.setCode("400");
@@ -51,7 +51,7 @@ public class AuthenticationService {
 		User user = userOptional.get();
 		String enPassword = PasswordUtil.getEncryptedPassword(request.getPassword());
 
-		if (!user.getUsername().equals(request.getUserName())) {
+		if (!user.getEmail().equals(request.getEmail())) {
 			errorDto = new ErrorDto();
 			errorDto.setCode("400");
 			errorDto.setMessage("Invalid username.!");
@@ -76,6 +76,7 @@ public class AuthenticationService {
 		response.put("jwt", token);
 		response.put("userId", user.getId());
 		response.put("userName", user.getUsername());
+		response.put("userEmail", user.getEmail());
 		response.put("role", user.getUserRole());
 
 		return ResponseEntity.ok().body(response);

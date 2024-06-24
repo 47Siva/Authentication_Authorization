@@ -66,7 +66,7 @@ public class UserController {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@PutMapping(value = "/update",  produces = "application/json")
-	public ResponseEntity<?> update(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload")
+	public ResponseEntity<?> update(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Update request payload")
 	        @RequestBody UserRegisterRequest request,
 			@RequestHeader HttpHeaders httpHeader,
 			@RequestHeader ("Authorization")String auth) throws Exception {
@@ -85,12 +85,12 @@ public class UserController {
 	@Operation(description = "Delete End Point", summary = "Allows to delete use by user name.", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@DeleteMapping(value =  "/deleteUser/{username}")
-	public ResponseEntity<?>DeleteUser(@PathVariable("username") String username,
+	@DeleteMapping(value =  "/deleteUser/{useremail}")
+	public ResponseEntity<?>DeleteUser(@PathVariable("useremail") String useremail,
 			                            @RequestHeader HttpHeaders httpHeader){
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeader);
 		try {
-			User userObject = userService.findByUserName(username).get();
+			User userObject = userService.findByUserEmail(useremail).get();
 
 			if (null == userObject) {
 				return responseGenerator.errorResponse(context, ResponseMessage.INVALID_OBJECT_REFERENCE,

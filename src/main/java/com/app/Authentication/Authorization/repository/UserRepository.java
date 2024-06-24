@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	@Query(value = "select * from user_details where mobile_no =:mobileNo ", nativeQuery = true)
 	Optional<User> getByMobileNo(String mobileNo);
 
-	@Query(value = "select * from user_details where email ", nativeQuery = true)
+	@Query(value = "select * from user_details where email =:email ", nativeQuery = true)
 	Optional<User> findByUserEmail(String email);
 
 	@Query(value = "SELECT * FROM user_details where role=:admin", nativeQuery = true)
