@@ -132,4 +132,5 @@ public class JwtService {
 	public String extractRole(String token) {
 		return extractClaim(token, claims -> claims.get("role", String.class));
 	}
+
 }

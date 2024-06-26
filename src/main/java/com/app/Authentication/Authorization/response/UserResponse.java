@@ -1,5 +1,7 @@
 package com.app.Authentication.Authorization.response;
 
+import java.util.UUID;
+
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.Status;
 
@@ -13,7 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserResponse {
-
+	
+	private UUID userId;
+	
 	private String userName;
 	
 	private String email;

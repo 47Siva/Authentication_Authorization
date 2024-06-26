@@ -102,11 +102,11 @@ public class RegisterValidator {
 			errors.add(messageService.messageResponse("user.register.email.duplicate"));
 		}
 
-		Optional<User> userDuplicateObj = userService.findByDuplicateUserName(request.getUserName());
-		if (userDuplicateObj.isPresent()) {
-			String[] params = new String[] { request.getUserName() };
-			errors.add(messageService.messageResponse("user.name.duplicate", params));
-		}
+//		Optional<User> userDuplicateObj = userService.findByDuplicateUserName(request.getUserName());
+//		if (userDuplicateObj.isPresent()) {
+//			String[] params = new String[] { request.getUserName() };
+//			errors.add(messageService.messageResponse("user.name.duplicate", params));
+//		}
 
 		Optional<User> userExist = userService.getMobileNos(request.getMobileNo());
 		if (userExist.isPresent()) {
@@ -114,11 +114,11 @@ public class RegisterValidator {
 			errors.add(messageService.messageResponse("register.mobileno.exist", params));
 		}
 
-		Optional<User> userPasswordexit = userService.findByDuplicatePassword(request.getPassword());
-		if (userPasswordexit.isPresent()) {
-			String[] params = new String[] { request.getPassword() };
-			errors.add(messageService.messageResponse("register.password.already.exist", params));
-		}
+//		Optional<User> userPasswordexit = userService.findByDuplicatePassword(request.getPassword());
+//		if (userPasswordexit.isPresent()) {
+//			String[] params = new String[] { request.getPassword() };
+//			errors.add(messageService.messageResponse("register.password.already.exist", params));
+//		}
 
 		ValidationResult result = new ValidationResult();
 		if (errors.size() > 0) {

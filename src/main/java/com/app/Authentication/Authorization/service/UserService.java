@@ -126,22 +126,23 @@ public class UserService implements UserDetailsService {
 	}
 
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<?> getuserDetailsUserNameFromToken(String username, String auth) throws SignatureException {
+	public ResponseEntity<?> getuserDetailsUserNameFromToken(String useremail, String auth) throws SignatureException {
 
 		// Construct response
 		Map<String, Object> response = new HashMap<>();
 		String token = jwtService.extractToken(auth);
-		String tokenusername = jwtService.extractUserName(token);
+		String tokenName = jwtService.extractUserName(token);
 
 		// Validate token
 		if (!jwtService.validateToken(token)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 		}
 
-		Optional<User> userdetails = userRepository.findByUserName(username);
-		if (username.equals(tokenusername)) {
-			if (userdetails.isPresent()) {
-				User user = userdetails.get();
+		//Optional<User> userdetails1 = userRepository.findByUserName(useremail);
+		Optional<User> userdetails2 = userRepository.findByUserName(tokenName);
+		if (useremail.equals(userdetails2.get().getEmail())) {
+			if (userdetails2.isPresent()) {
+				User user = userdetails2.get();
 
 				if (!user.getUserRole().equals(Role.USER)) {
 					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
@@ -149,11 +150,11 @@ public class UserService implements UserDetailsService {
 					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
 					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 				}
-				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
-						.mobileNo(user.getMobileNo()).status(user.getStatus()).build();
+				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail()).userName(user.getUsername())
+						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
 
 				// Retrieve user details
-				UserDetails userDetails = loadUserByUsername(userdetails.get().getUsername());
+				UserDetails userDetails = loadUserByUsername(userdetails2.get().getUsername());
 				response.put("Authorities", userDetails.getAuthorities());
 				response.put("Details", userresponse);
 				return ResponseEntity.ok(response);
@@ -165,7 +166,7 @@ public class UserService implements UserDetailsService {
 			}
 		} else {
 			response.put("Status", HttpStatus.BAD_REQUEST.toString());
-			response.put("message", "User Name and Token Mismatch. please Enter the Valid Data");
+			response.put("message", "User bad request Please enter the Valid Data");
 			response.put("Error", HttpStatus.BAD_REQUEST);
 			return ResponseEntity.badRequest().body(response);
 		}
