@@ -41,12 +41,12 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
         return userService.getAllUsers(auth);
     }
 	
-	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by Name api", responses = {
+	@Operation(description = "Get End Point", summary = "This is a Token Validation and Get User by email api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping(value = "/getUser/{username}", produces = "application/json")
-	public ResponseEntity<?>getUser(@PathVariable ("username") String username ,@RequestHeader("Authorization") String auth){
+	@GetMapping(value = "/getUser/{useremail}", produces = "application/json")
+	public ResponseEntity<?>getUser(@PathVariable ("useremail") String useremail ,@RequestHeader("Authorization") String auth){
 		
-		 return  adminService.getadmindetials(username , auth);
+		 return  adminService.getadmindetials(useremail , auth);
 	}
 }

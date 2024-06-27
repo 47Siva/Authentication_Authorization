@@ -35,7 +35,7 @@ public class AdminService {
 		return userRepository.saveAndFlush(adminobj);
 	}
 
-	public ResponseEntity<?> getadmindetials(String username, String auth) {
+	public ResponseEntity<?> getadmindetials(String useremail, String auth) {
 
 		try {
 			String token = jwtService.extractToken(auth);
@@ -45,7 +45,7 @@ public class AdminService {
 			if (!jwtService.validateToken(token)) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 			}
-			Optional<User> userdetails = userRepository.findByUserName(username);
+			Optional<User> userdetails = userRepository.findByUserEmail(useremail);
 			if (userdetails.isPresent()) {
 				User user = userdetails.get();
 				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())

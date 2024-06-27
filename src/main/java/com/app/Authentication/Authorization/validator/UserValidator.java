@@ -170,6 +170,7 @@ public class UserValidator {
 			user.setUserRole(request.getUserRole());
 			user.setEmail(request.getEmail());
 			user.setMobileNo(request.getMobileNo());
+			user.setPassword(encrptPassword);
 		}
 		result.setObject(user);
 		return result;
