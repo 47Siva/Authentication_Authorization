@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,7 +57,7 @@ public class UserController {
 	@Operation(description = "Get End Point", summary = "Allows to fetch user by user name.", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping(value = "/getUser/{useremail}", produces = "application/json")
+	@GetMapping(value = "/getUser/{useremail}")
 	public ResponseEntity<?>getUser(@PathVariable ("useremail") String useremail ,@RequestHeader("Authorization") String auth){
 		
 		 return userService.getuserDetailsUserNameFromToken(useremail , auth);
@@ -65,7 +66,7 @@ public class UserController {
 	@Operation(description = "PUT End Point", summary = "Allows to update existing user.", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@PutMapping(value = "/update",  produces = "application/json")
+	@PutMapping(value = "/update")
 	public ResponseEntity<?> update(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Update request payload")
 	        @RequestBody UserRegisterRequest request,
 			@RequestHeader HttpHeaders httpHeader,

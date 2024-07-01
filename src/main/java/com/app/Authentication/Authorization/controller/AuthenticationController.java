@@ -63,7 +63,7 @@ public class AuthenticationController {
 	@Operation(description = "Post End Point", summary = "This is a User register api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@PostMapping(value = "/user/register",consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_NDJSON_VALUE)
+	@PostMapping(value = "/user/register", produces = "application/json")
 	
 	public ResponseEntity<?> userRegister(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload") @RequestBody UserRegisterRequest userRegisterRequest,
