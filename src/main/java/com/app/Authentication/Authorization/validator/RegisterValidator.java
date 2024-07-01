@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.app.Authentication.Authorization.advice.ObjectInvalidException;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.RequestType;
+import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.request.UserRegisterRequest;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.service.UserService;
@@ -65,10 +66,9 @@ public class RegisterValidator {
 
 		if (ValidationUtil.isNullOrEmpty(request.getPassword())) {
 			errors.add(messageService.messageResponse("register.password.required"));
-		}else if(ValidationUtil.isNullOrEmpty(request.getConfirmPassword())) {
+		} else if (ValidationUtil.isNullOrEmpty(request.getConfirmPassword())) {
 			errors.add(messageService.messageResponse("register.confirmPassword.required"));
-		}
-		else {
+		} else {
 			request.setPassword(ValidationUtil.getFormattedString(request.getPassword()));
 			if (!ValidationUtil.isValidPassword(request.getPassword())) {
 				errors.add(messageService.messageResponse("register.password.invalid"));
@@ -77,24 +77,25 @@ public class RegisterValidator {
 				errors.add(messageService.messageResponse("password.mismatch"));
 			}
 		}
-		
 
 		String role = request.getUserRole().toString();
-		
-		if(role.equals("ADMIN")) {
+
+		if (role.equals("ADMIN")) {
 			Optional<User> userDuplicateRole = userService.findByUserRoleType(role);
-			if(userDuplicateRole.isPresent()) {
+			if (userDuplicateRole.isPresent()) {
 				errors.add(messageService.messageResponse("register.role.present"));
 			}
 		}
-		if(ValidationUtil.isRolerequired(request.getUserRole())) {
+		if (ValidationUtil.isRolerequired(request.getUserRole())) {
 			errors.add(messageService.messageResponse("register.role.required"));
-		}else {
-			request.setUserRole(ValidationUtil.getFormattedRole(request.getUserRole()));
-			if(!ValidationUtil.isRoleValid(request.getUserRole())) {
+		} else {
+			Role formattedRole = ValidationUtil.getFormattedRoles(request.getUserRole().toString());
+			request.setUserRole(formattedRole);
+//			request.setUserRole(ValidationUtil.getFormattedRole(request.getUserRole()));
+			if (!ValidationUtil.isRoleValid(request.getUserRole())) {
 				errors.add(messageService.messageResponse("register.role.invalid"));
 			}
-			
+
 		}
 
 		Optional<User> userDuplicateMailObj = userService.findByDuplicateEmail(request.getEmail());

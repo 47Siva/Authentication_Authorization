@@ -1,5 +1,7 @@
 package com.app.Authentication.Authorization.enumeration;
 
+import com.app.Authentication.Authorization.advice.HttpMessageNotReadableException;
+
 public enum Role {
 	
 	ADMIN,USER;
@@ -10,7 +12,8 @@ public enum Role {
                 return role;
             }
         }
-        throw new IllegalArgumentException("Invalid role: " + value);
+//        throw new IllegalArgumentException("Invalid role: " + value);
+        throw new HttpMessageNotReadableException("Invalid role: " + value);
     }
 
 }

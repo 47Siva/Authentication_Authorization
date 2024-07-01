@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -62,7 +63,8 @@ public class AuthenticationController {
 	@Operation(description = "Post End Point", summary = "This is a User register api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@PostMapping(value = "/user/register", produces = "application/json")
+	@PostMapping(value = "/user/register",consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_NDJSON_VALUE)
+	
 	public ResponseEntity<?> userRegister(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload") @RequestBody UserRegisterRequest userRegisterRequest,
 			@RequestHeader HttpHeaders httpHeaders) throws Exception {
@@ -88,31 +90,31 @@ public class AuthenticationController {
 		}
 	}
 
-	@Operation(description = "Post End Point", summary = "This is a Admin register api", responses = {
-			@ApiResponse(description = "Success", responseCode = "200"),
-			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@PostMapping(value = "/admin/register", produces = "application/json")
-	public ResponseEntity<?> adminRegister(@RequestBody AdminRegister register,
-			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Admin Signup request payload") @RequestHeader HttpHeaders httpHeaders) {
-		ValidationResult validationResult = adminValidator.validate(RequestType.POST, register);
-		User user = (User) validationResult.getObject();
-
-		User adminservice = adminService.createAdmin(user);
-		Map<String, Object> response = new HashMap<>();
-		final String token = jwtService.generateToken(adminservice);
-		response.put("Status", 1);
-		response.put("message", "You have register successfully.");
-		response.put("token", token);
-
-		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
-		try {
-			return responseGenerator.successResponse(context, response, HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
+//	@Operation(description = "Post End Point", summary = "This is a Admin register api", responses = {
+//			@ApiResponse(description = "Success", responseCode = "200"),
+//			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
+//	@PostMapping(value = "/admin/register", produces = "application/json")
+//	public ResponseEntity<?> adminRegister(@RequestBody AdminRegister register,
+//			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Admin Signup request payload") @RequestHeader HttpHeaders httpHeaders) {
+//		ValidationResult validationResult = adminValidator.validate(RequestType.POST, register);
+//		User user = (User) validationResult.getObject();
+//
+//		User adminservice = adminService.createAdmin(user);
+//		Map<String, Object> response = new HashMap<>();
+//		final String token = jwtService.generateToken(adminservice);
+//		response.put("Status", 1);
+//		response.put("message", "You have register successfully.");
+//		response.put("token", token);
+//
+//		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
+//		try {
+//			return responseGenerator.successResponse(context, response, HttpStatus.OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			logger.error(e.getMessage(), e);
+//			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
+//		}
+//	}
 
 	@Operation(description = "Get End Point", summary = "This is a User login api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),

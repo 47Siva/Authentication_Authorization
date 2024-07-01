@@ -16,7 +16,8 @@ public class RoleEnumDeserializer extends JsonDeserializer<Role> {
     public Role deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         String value = p.getText().toUpperCase();
         try {
-            return Role.valueOf(value);
+//            return Role.valueOf(value);
+        	return Role.fromString(value);
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid role: " + value, e);
         }

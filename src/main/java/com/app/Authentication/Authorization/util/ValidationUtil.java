@@ -111,6 +111,8 @@ public class ValidationUtil {
 		return roleTypetoString.equalsIgnoreCase("admin") || roleTypetoString.equalsIgnoreCase("user");
 	}
 
+	
+	
 	public static boolean isValidPassword(String password) {
 		if (password == null) {
 			return false;
@@ -247,6 +249,14 @@ public class ValidationUtil {
 		return null;
 	}
 
+    public static Role getFormattedRoles(String role) {
+        try {
+            return Role.fromString(role);
+        } catch (IllegalArgumentException e) {
+            return null; // Return null if role is invalid
+        }
+    }
+	
 	public static boolean isNullObject(Role value) {
 		return null == value;
 	}
