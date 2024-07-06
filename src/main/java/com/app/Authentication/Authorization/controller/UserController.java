@@ -57,7 +57,7 @@ public class UserController {
 	@Operation(description = "Get End Point", summary = "Allows to fetch user by user name.", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping(value = "/getUser/{useremail}")
+	@GetMapping(value = "/getUser/{useremail}" , produces = "application/json")
 	public ResponseEntity<?>getUser(@PathVariable ("useremail") String useremail ,@RequestHeader("Authorization") String auth){
 		
 		 return userService.getuserDetailsUserNameFromToken(useremail , auth);

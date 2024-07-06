@@ -1,10 +1,13 @@
 package com.app.Authentication.Authorization.security;
 
 
+import static com.app.Authentication.Authorization.util.Constants.HEADER_STRING;
 import static com.app.Authentication.Authorization.util.Constants.TOKEN_PREFIX;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,15 +18,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import com.app.Authentication.Authorization.advice.SignatureException;
-
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import static com.app.Authentication.Authorization.util.Constants.*;
 
 
 //@RequiredArgsConstructor
@@ -36,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private  HandlerExceptionResolver exceptionResolver;
 	
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
 	@Autowired
     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver exceptionResolver) {
         this.jwtService = jwtService;
@@ -67,6 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			exceptionResolver.resolveException(request, response, null, e);
 		}
 	}
