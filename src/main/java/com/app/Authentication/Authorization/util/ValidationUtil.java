@@ -90,6 +90,17 @@ public class ValidationUtil {
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
 		return m.matches();
+		
+//		This regex will match strings like:
+//		"abc"
+//		"abc def"
+//		"abc-def"
+//		"abc # def"
+//		"abc/def"
+//		"abc(def)&"
+		
+//		"%abc"-- return false % is not allowed
+//		"abc@def" -- return false @ is not allowed
 	}
 
 	public static boolean isGenderrequired(GenderType gender) {

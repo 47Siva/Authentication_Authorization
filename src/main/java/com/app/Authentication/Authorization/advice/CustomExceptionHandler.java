@@ -85,11 +85,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		Error errors = new Error();
 		errors.setErrorList((Stream.of(ex.getMessage().split(",")).collect(Collectors.toList())));
 		errors.setReason(ex.getMessage());
-		errors.setCode(HttpStatus.CONFLICT.toString());
+		errors.setCode(HttpStatus.BAD_REQUEST.toString());
 		Response response = new Response();
 		response.setError(errors);
 		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
-		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(MalformedJwtException.class)

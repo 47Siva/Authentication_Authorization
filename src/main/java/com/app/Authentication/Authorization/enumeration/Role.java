@@ -4,7 +4,7 @@ import com.app.Authentication.Authorization.advice.HttpMessageNotReadableExcepti
 
 public enum Role {
 	
-	ADMIN,USER;
+	ADMIN,USER,CUSTOMER;
 	
 	  public static Role fromString(String value) {
         for (Role role : Role.values()) {
