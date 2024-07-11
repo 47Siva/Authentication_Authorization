@@ -39,7 +39,6 @@ public class InvoiceService {
 
 	public ResponseEntity<?> buyProduct(Customer customer, BuyProductRequest request) {
 
-		Map<String, Object> response = new HashMap<>();
 		if (customer == null) {
 			throw new IllegalArgumentException(messageSource.messageResponse("customer.required"));
 		}
@@ -78,10 +77,23 @@ public class InvoiceService {
 				productobj.setAvailableQuantity(availableQuantity);
 				productRepository.save(productobj);
 				availableQuantity = 0;
-				CustomerProduct customerProduct = CustomerProduct.builder().price(productobj.getPrice())
-						.productName(productobj.getProductName()).quantity(product.getQuantity())
-						.totalAmount(singleProductAmount).build();
-				productlist.add(customerProduct);
+
+				boolean productExists = false;
+				for (CustomerProduct customerProduct : productlist) {
+					if (customerProduct.getProductName().equals(productobj.getProductName())) {
+						customerProduct.setQuantity(customerProduct.getQuantity() + product.getQuantity());
+						customerProduct.setTotalAmount(customerProduct.getTotalAmount() + singleProductAmount);
+						productExists = true;
+						break;
+					}
+				}
+
+				if (!productExists) {
+					CustomerProduct customerProduct = CustomerProduct.builder().price(productobj.getPrice())
+							.productName(productobj.getProductName()).quantity(product.getQuantity())
+							.totalAmount(singleProductAmount).build();
+					productlist.add(customerProduct);
+				}
 			} else {
 				String error = messageSource.messageResponse("product.not.valid");
 				throw new NullPointerException(error);
@@ -94,7 +106,7 @@ public class InvoiceService {
 		double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
 		double discountAmount = shopDiscount * totalProductAmount;
 		double grandTotal = totalProductAmount - discountAmount;
-		
+
 		CustomerDto customerdto = CustomerDto.builder().customerName(customerData.getCustomerName())
 				.date(LocalDate.parse(customerData.getDate())).email(customerData.getEmail())
 				.address(customerData.getAddress()).gender(customerData.getGender()).id(customerData.getId())
@@ -109,7 +121,8 @@ public class InvoiceService {
 		customerdto.setCustomerProducts(productDto);
 
 		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).shopDiscount("2%")
-				.discountAmount(discountAmount).grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();
+				.discountAmount(discountAmount).grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount)
+				.build();
 
 		return ResponseEntity.ok(invoiceResponse);
 	}
