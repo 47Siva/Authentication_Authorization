@@ -11,7 +11,9 @@ public class InvoiceResponse {
 
 	private CustomerDto customer;
 	private Double totalprouctsAmount;
-	private Double discountAmount;
+	private String gst;
+	private Double gstAmount;
 	private String shopDiscount;
+	private Double discountAmount;
 	private Double grandTotalAmount;
 }
