@@ -22,7 +22,11 @@ public class ProductService {
 				.price(request.getPrice()).productName(request.getProductName())
 				.build();
 		
+		if(request.getProductName().equals("string")) {
+			throw new IllegalArgumentException("Product name not valid");
+		}else {
 	    product = productRepository.save(product);
+		}
 	    
 	    ProductDto dto = ProductDto.builder().availableQuantity(product.getAvailableQuantity())
 	    		.id(product.getId()).price(product.getPrice()).productName(product.getProductName()).build();

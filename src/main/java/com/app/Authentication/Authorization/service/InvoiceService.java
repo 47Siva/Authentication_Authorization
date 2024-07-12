@@ -102,10 +102,14 @@ public class InvoiceService {
 		customerEntity.setCustomerProducet(productlist);
 		Customer customerData = customerRepository.save(customerEntity);
 
+		String Gststr = "5%";
 		String shopDiscountStr = "2%";
 		double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
+		double Gst = Double.parseDouble(Gststr.replace("%", "")) / 100.0;
+		double GstAmount = Gst * totalProductAmount;
 		double discountAmount = shopDiscount * totalProductAmount;
-		double grandTotal = totalProductAmount - discountAmount;
+		double grandTotal = totalProductAmount + GstAmount;
+		grandTotal = totalProductAmount - discountAmount;
 
 		CustomerDto customerdto = CustomerDto.builder().customerName(customerData.getCustomerName())
 				.date(LocalDate.parse(customerData.getDate())).email(customerData.getEmail())
@@ -120,8 +124,8 @@ public class InvoiceService {
 		}
 		customerdto.setCustomerProducts(productDto);
 
-		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).shopDiscount("2%")
-				.discountAmount(discountAmount).grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount)
+		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).gst(Gststr).shopDiscount(shopDiscountStr)
+				.gstAmount(GstAmount).discountAmount(discountAmount).grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount)
 				.build();
 
 		return ResponseEntity.ok(invoiceResponse);
