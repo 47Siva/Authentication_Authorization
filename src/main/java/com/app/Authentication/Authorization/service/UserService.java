@@ -1,5 +1,7 @@
 package com.app.Authentication.Authorization.service;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +18,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.app.Authentication.Authorization.advice.SignatureException;
+import com.app.Authentication.Authorization.entity.Customer;
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.Status;
+import com.app.Authentication.Authorization.repository.CustomerRepository;
 import com.app.Authentication.Authorization.repository.UserRepository;
+import com.app.Authentication.Authorization.response.CustomerResponse;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.UserMapper;
 import com.app.Authentication.Authorization.response.UserResponse;
@@ -34,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService implements UserDetailsService {
 
 	private final UserRepository userRepository;
+	private final CustomerRepository customerRepository;
 	private final JwtService jwtService;
 	private @NonNull MessageService messagePropertySource;
 
@@ -77,7 +83,7 @@ public class UserService implements UserDetailsService {
 	public Optional<User> findByUserId(UUID id) {
 		return userRepository.findById(id);
 	}
-	
+
 	public void saveOrUpdate(User userObject) {
 		userRepository.saveAndFlush(userObject);
 	}
@@ -85,7 +91,6 @@ public class UserService implements UserDetailsService {
 	public Optional<User> getByMobileNo(String mobileNo) {
 		return userRepository.getByMobileNo(mobileNo);
 	}
-
 
 	public Optional<User> findByUserEmail(String email) {
 		return userRepository.findByUserEmail(email);
@@ -102,7 +107,7 @@ public class UserService implements UserDetailsService {
 				user.getAuthorities());
 	}
 
-	@PreAuthorize("hasRole('ADMIN')" )
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllUsers(String auth) throws SignatureException {
 		Map<String, Object> response = new HashMap<>();
 		String token = jwtService.extractToken(auth);
@@ -138,7 +143,7 @@ public class UserService implements UserDetailsService {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 		}
 
-		//Optional<User> userdetails1 = userRepository.findByUserName(useremail);
+		// Optional<User> userdetails1 = userRepository.findByUserName(useremail);
 		Optional<User> userdetails2 = userRepository.findByUserName(tokenName);
 		if (useremail.equals(userdetails2.get().getEmail())) {
 			if (userdetails2.isPresent()) {
@@ -150,8 +155,9 @@ public class UserService implements UserDetailsService {
 					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
 					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 				}
-				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail()).userName(user.getUsername())
-						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
+				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail())
+						.userName(user.getUsername()).mobileNo(user.getMobileNo()).status(user.getStatus())
+						.userRole(user.getUserRole()).build();
 
 				// Retrieve user details
 				UserDetails userDetails = loadUserByUsername(userdetails2.get().getUsername());
@@ -171,7 +177,6 @@ public class UserService implements UserDetailsService {
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
-
 
 	public ResponseEntity<?> getuserdetials(String username) {
 		Optional<User> details = userRepository.findByUserName(username);
@@ -195,6 +200,32 @@ public class UserService implements UserDetailsService {
 
 	public void deleteUser(User userObject) {
 		userRepository.delete(userObject);
+	}
+
+	public ResponseEntity<?> getAllCustomer() {
+
+		List<Customer> customerData = customerRepository.findAll();
+		ArrayList<CustomerResponse> customerResponses = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+
+		if (customerData.isEmpty()) {
+			response.put("Error", messagePropertySource.messageResponse("Customers.empty"));
+			response.put("Status", HttpStatus.NO_CONTENT);
+			response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+		} else {
+			for (Customer customerObj : customerData) {
+				CustomerResponse customer = CustomerResponse.builder().id(customerObj.getId())
+						.customerName(customerObj.getCustomerName()).date(customerObj.getDate())
+						.address(customerObj.getAddress()).email(customerObj.getEmail()).gender(customerObj.getGender())
+						.mobileNo(customerObj.getMobileNo()).build();
+				customerResponses.add(customer);
+			}
+			response.put("Data", customerResponses);
+			response.put("Status", HttpStatus.OK);
+			response.put("StatusCode", HttpStatus.OK.toString());
+			return ResponseEntity.ok(response);
+		}
 	}
 
 }

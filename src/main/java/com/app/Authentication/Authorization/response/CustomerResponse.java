@@ -1,16 +1,23 @@
-package com.app.Authentication.Authorization.request;
+package com.app.Authentication.Authorization.response;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
-import com.app.Authentication.Authorization.entity.CustomerProduct;
 import com.app.Authentication.Authorization.enumeration.GenderType;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class BuyProductRequest {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class CustomerResponse {
+
+	private UUID id;
+	
+	private UUID userId;
 	
 	private String customerName;
 	
@@ -23,6 +30,4 @@ public class BuyProductRequest {
 	private String date;
 	
 	private GenderType gender;
-	
-	private List<CustomerProductRequest> customerProduct;
 }

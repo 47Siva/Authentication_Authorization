@@ -1,6 +1,6 @@
 package com.app.Authentication.Authorization.response;
 
-import com.app.Authentication.Authorization.dto.CustomerDto;
+import com.app.Authentication.Authorization.dto.CustomerAndProductDto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 public class InvoiceResponse {
 
-	private CustomerDto customer;
+	private CustomerAndProductDto customer;
 	private Double totalprouctsAmount;
 	private String gst;
 	private Double gstAmount;

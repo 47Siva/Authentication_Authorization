@@ -1,19 +1,15 @@
 package com.app.Authentication.Authorization.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.app.Authentication.Authorization.advice.NullPointerException;
-import com.app.Authentication.Authorization.dto.CustomerDto;
+import com.app.Authentication.Authorization.dto.CustomerAndProductDto;
 import com.app.Authentication.Authorization.dto.CustomerProductDto;
 import com.app.Authentication.Authorization.entity.Customer;
 import com.app.Authentication.Authorization.entity.CustomerProduct;
@@ -111,8 +107,8 @@ public class InvoiceService {
 		double grandTotal = totalProductAmount + GstAmount;
 		grandTotal = totalProductAmount - discountAmount;
 
-		CustomerDto customerdto = CustomerDto.builder().customerName(customerData.getCustomerName())
-				.date(LocalDate.parse(customerData.getDate())).email(customerData.getEmail())
+		CustomerAndProductDto customerdto = CustomerAndProductDto.builder().customerName(customerData.getCustomerName())
+				.date(customerData.getDate()).email(customerData.getEmail())
 				.address(customerData.getAddress()).gender(customerData.getGender()).id(customerData.getId())
 				.mobileNo(customerData.getMobileNo()).build();
 		List<CustomerProductDto> productDto = new ArrayList<>();

@@ -110,7 +110,7 @@ public class CustomerValidator {
 //		 List<CustomerProduct> customerProducts = CustomerProductConverter.convert(request.getCustomerProduct());
 
 		customer = Customer.builder().email(request.getEmail()).address(request.getAddress())
-				.customerName(request.getCustomerName()).date(LocalDate.now().toString())
+				.customerName(request.getCustomerName()).date(request.getDate())
 				.mobileNo(request.getMobileNo()).gender(request.getGender()).build();
 		result.setObject(customer);
 		return result;
