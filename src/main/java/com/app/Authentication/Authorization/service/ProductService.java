@@ -1,5 +1,7 @@
 package com.app.Authentication.Authorization.service;
 
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,21 +19,30 @@ public class ProductService {
 	private final ProductRepository productRepository;
 
 	public ResponseEntity<?> addProducts(ProductRequest request) {
-		
-		Product product = Product.builder().availableQuantity(request.getProductQuantity())
-				.price(request.getPrice()).productName(request.getProductName())
-				.build();
-		
-		if(request.getProductName().equals("string")) {
-			throw new IllegalArgumentException("Product name not valid");
-		}else {
-	    product = productRepository.save(product);
+
+		Optional<Product> productData = productRepository.findByName(request.getProductName());
+
+		if (productData.isPresent()) {
+			Product productobj = productData.get();
+			productobj.setAvailableQuantity(request.getProductQuantity());
+			productobj.setPrice(request.getPrice());
+			productobj = productRepository.saveAndFlush(productobj);
+			return ResponseEntity.ok(productobj);
+		} else {
+
+			Product product = Product.builder().availableQuantity(request.getProductQuantity())
+					.price(request.getPrice()).productName(request.getProductName()).build();
+
+			if (request.getProductName().equals("string")) {
+				throw new IllegalArgumentException("Product name not valid");
+			} else {
+				product = productRepository.save(product);
+			}
+
+			ProductDto dto = ProductDto.builder().availableQuantity(product.getAvailableQuantity()).id(product.getId())
+					.price(product.getPrice()).productName(product.getProductName()).build();
+			return ResponseEntity.ok(dto);
 		}
-	    
-	    ProductDto dto = ProductDto.builder().availableQuantity(product.getAvailableQuantity())
-	    		.id(product.getId()).price(product.getPrice()).productName(product.getProductName()).build();
-		return ResponseEntity.ok(dto);
 	}
-	
-	
+
 }
