@@ -12,7 +12,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CustomerDto {
+public class CustomerAndProductDto {
 
 	private UUID id;
 	
@@ -26,7 +26,7 @@ public class CustomerDto {
 	
 	private String address;
 	
-	private LocalDate date ;
+	private String date ;
 	
 	private GenderType gender;
 	
