@@ -24,6 +24,7 @@ import com.app.Authentication.Authorization.request.BuyProductRequest;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.ResponseGenerator;
 import com.app.Authentication.Authorization.response.TransactionContext;
+import com.app.Authentication.Authorization.service.CustomerServicee;
 import com.app.Authentication.Authorization.service.InvoiceService;
 import com.app.Authentication.Authorization.service.UserService;
 import com.app.Authentication.Authorization.validator.CustomerValidator;
@@ -44,6 +45,7 @@ public class InvoiceController {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final UserService userService;
+	private final CustomerServicee customerService;
 	private final MessageService messageService;
 	private final ResponseGenerator responseGenerator;
 	private final InvoiceService invoiceService;
@@ -64,7 +66,7 @@ public class InvoiceController {
 
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK);
+			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK,false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(), e);
@@ -82,14 +84,33 @@ public class InvoiceController {
 		ResponseEntity<?>response = null;
 		
 //		try {
-		response = userService.getAllCustomer();
+		response = customerService.getAllCustomer();
 //		}catch (java.lang.NullPointerException e) {
 //			String error = messageService.messageResponse("Customers.empty");
 //			throw new NullPointerException(error);
 //		}
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK);
+			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK,false);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@Operation(description = "Get End Point", summary = "This is a get All Customer And ByedProduct Api", responses = {
+			@ApiResponse(description = "Success", responseCode = "200"),
+			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
+	@GetMapping("/getAllCustomerAndBuyedProduct")
+	public ResponseEntity<?> getAllCustomerAndProduct(@RequestHeader HttpHeaders httpHeaders) {
+		
+		ResponseEntity<?>response = null;
+		response = customerService.getAllCustomerAndProduct();
+		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
+		try {
+			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK,false);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -105,11 +126,11 @@ public class InvoiceController {
 	public ResponseEntity<?> getCustomer(@RequestHeader HttpHeaders httpHeaders,
 			@PathVariable UUID id) {
 		
-		ResponseEntity<?> response = userService.getCustomer(id);
+		ResponseEntity<?> response = customerService.getCustomer(id);
 		
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK);
+			return responseGenerator.successResponse(context, response.getBody(), HttpStatus.OK,false);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

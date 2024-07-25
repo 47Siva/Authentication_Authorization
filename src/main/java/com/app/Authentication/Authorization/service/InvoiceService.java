@@ -104,8 +104,7 @@ public class InvoiceService {
 		double Gst = Double.parseDouble(Gststr.replace("%", "")) / 100.0;
 		double GstAmount = Gst * totalProductAmount;
 		double discountAmount = shopDiscount * totalProductAmount;
-		double grandTotal = totalProductAmount + GstAmount;
-		grandTotal = totalProductAmount - discountAmount;
+		double grandTotal = totalProductAmount + GstAmount - discountAmount;
 
 		CustomerAndProductDto customerdto = CustomerAndProductDto.builder().customerName(customerData.getCustomerName())
 				.date(customerData.getDate()).email(customerData.getEmail())
