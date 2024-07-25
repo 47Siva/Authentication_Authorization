@@ -1,6 +1,9 @@
 package com.app.Authentication.Authorization.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,16 +26,22 @@ public class ProductService {
 		Optional<Product> productData = productRepository.findByName(request.getProductName());
 
 		if (productData.isPresent()) {
-			Product productobj = productData.get();
-			productobj.setAvailableQuantity(request.getProductQuantity());
-			productobj.setPrice(request.getPrice());
-			productobj = productRepository.saveAndFlush(productobj);
-			return ResponseEntity.ok(productobj);
+			Product productObj = productData.get();
+			productObj.setAvailableQuantity(productObj.getAvailableQuantity() + request.getProductQuantity());
+			productObj.setPrice(request.getPrice());
+			productObj = productRepository.saveAndFlush(productObj);
+			
+			ProductDto productDto = ProductDto.builder()
+					.availableQuantity(productObj.getAvailableQuantity())
+					.id(productObj.getId())
+					.productName(productObj.getProductName())
+					.price(productObj.getPrice()).build();
+			return ResponseEntity.ok(productDto);
 		} else {
 
 			Product product = Product.builder().availableQuantity(request.getProductQuantity())
 					.price(request.getPrice()).productName(request.getProductName()).build();
-
+			
 			if (request.getProductName().equals("string")) {
 				throw new IllegalArgumentException("Product name not valid");
 			} else {
@@ -42,6 +51,21 @@ public class ProductService {
 			ProductDto dto = ProductDto.builder().availableQuantity(product.getAvailableQuantity()).id(product.getId())
 					.price(product.getPrice()).productName(product.getProductName()).build();
 			return ResponseEntity.ok(dto);
+		}
+	}
+
+	public ResponseEntity<?> getProduct(UUID id) {
+		Optional<Product> productData = productRepository.findById(id);
+		if(productData.isPresent()) {
+			Product productObj = productData.get();
+			ProductDto productDto = ProductDto.builder()
+					.availableQuantity(productObj.getAvailableQuantity())
+					.id(productObj.getId())
+					.productName(productObj.getProductName())
+					.price(productObj.getPrice()).build();
+			return ResponseEntity.ok(productDto);
+		}else {
+			return ResponseEntity.badRequest().body("Product Not Found ..!");
 		}
 	}
 

@@ -75,7 +75,7 @@ public class UserController {
 		ValidationResult validationResult = userValidator.validate(RequestType.PUT, request,auth);
 		userService.saveOrUpdate((User) validationResult.getObject());
 		try {
-			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.update"), HttpStatus.OK);
+			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.update"), HttpStatus.OK,false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(), e);
@@ -102,7 +102,7 @@ public class UserController {
 			userService.deleteUser(userObject);
 
 			return responseGenerator.successResponse(context, messagePropertySource.messageResponse("user.delete"),
-					HttpStatus.OK);
+					HttpStatus.OK,false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(), e);

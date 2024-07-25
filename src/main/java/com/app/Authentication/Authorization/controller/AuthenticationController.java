@@ -82,7 +82,7 @@ public class AuthenticationController {
 
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			return responseGenerator.successResponse(context, response, HttpStatus.OK);
+			return responseGenerator.successResponse(context, response, HttpStatus.OK,false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(), e);
@@ -129,7 +129,7 @@ public class AuthenticationController {
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
 			if (authenticationServiceResponse.getStatusCode() == HttpStatus.OK) {
-				return responseGenerator.successResponse(context, authenticationServiceResponse, HttpStatus.OK);
+				return responseGenerator.successResponse(context, authenticationServiceResponse.getBody(), HttpStatus.OK,false);
 			}
 			return authenticationServiceResponse;
 		} catch (Exception e) {
