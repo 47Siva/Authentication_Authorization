@@ -1,5 +1,6 @@
 package com.app.Authentication.Authorization.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -58,17 +59,55 @@ public class ProductController {
 		}
 	}
 	
+	@Operation(description = "Post End Point", summary = "Add Product Api", responses = {
+			@ApiResponse(description = "Success", responseCode = "200"),
+			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
+	@PostMapping("/add/product/list")
+	public ResponseEntity<?> addProductsList(
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Product request payload") 
+			@RequestHeader HttpHeaders httpHeaders,
+			@RequestBody List<ProductRequest> request) {
+		ResponseEntity<?> productservice = productService.addProductList(request);
+		
+		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
+		try {
+			return responseGenerator.successResponse(context, productservice.getBody(), HttpStatus.OK,false);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@Operation(description = "Post End Point", summary = "Get Product Api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping("/get/product/{id}")
+	@GetMapping("/get/product/{productName}")
 	public ResponseEntity<?> getProduct(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Give the Product ID ") 
 			@RequestHeader HttpHeaders httpHeaders,
-			@PathVariable UUID id){
+			@PathVariable String productName){
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
-			ResponseEntity<?>productservice =productService.getProduct(id);
+			ResponseEntity<?>productservice =productService.getProduct(productName);
+			return responseGenerator.successResponse(context, productservice.getBody(), HttpStatus.OK,false);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			return responseGenerator.errorResponse(context, e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@Operation(description = "Post End Point", summary = "Get All Product Api", responses = {
+			@ApiResponse(description = "Success", responseCode = "200"),
+			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
+	@GetMapping("/get/All/product")
+	public ResponseEntity<?> getAllProduct(
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Give the Product ID ") 
+			@RequestHeader HttpHeaders httpHeaders){
+		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
+		try {
+			ResponseEntity<?>productservice =productService.getAllProduct();
 			return responseGenerator.successResponse(context, productservice.getBody(), HttpStatus.OK,false);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -40,7 +40,6 @@ public class RegisterValidator {
 		if (ValidationUtil.isNullOrEmpty(request.getUserName())) {
 			errors.add(messageService.messageResponse("register.user.name.required"));
 		} else {
-			request.setUserName(ValidationUtil.getFormattedString(request.getUserName()));
 			if (!ValidationUtil.isUserNameValid(request.getUserName())) {
 				errors.add(messageService.messageResponse("register.user.name.invalid"));
 			}

@@ -79,7 +79,7 @@ public class ValidationUtil {
 		if (userName == null || userName.length() < 3 || userName.length() > 20) {
 			return false;
 		}
-		return userName.matches("^[a-zA-Z][a-zA-Z0-9]+$");
+		return userName.matches("^[a-zA-Z][a-zA-Z0-9 ]*[a-zA-Z0-9]$");
 
 //		IF THE USERNAME IS "USER123", IT WILL RETURN TRUE BECAUSE IT MEETS ALL THE CRITERIA.
 //		IF THE USERNAME IS "USER!123", IT WILL RETURN FALSE BECAUSE IT CONTAINS A SPECIAL CHARACTER (!) WHICH IS NOT ALLOWED.

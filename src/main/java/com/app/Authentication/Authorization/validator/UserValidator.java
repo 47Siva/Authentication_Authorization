@@ -59,7 +59,6 @@ public class UserValidator {
 			if (ValidationUtil.isNullOrEmpty(request.getUserName())) {
 				errors.add(messageSource.messageResponse("register.user.name.required"));
 			} else {
-				request.setUserName((ValidationUtil.getFormattedString(request.getUserName())));
 				if (!ValidationUtil.isUserNameValid(request.getUserName())) {
 					errors.add(messageSource.messageResponse("register.user.name.invalid"));
 				}
@@ -119,7 +118,6 @@ public class UserValidator {
 		if (ValidationUtil.isNullOrEmpty(request.getUserName())) {
 			errors.add(messageSource.messageResponse("register.user.name.required"));
 		} else {
-			request.setUserName(ValidationUtil.getFormattedString(request.getUserName()));
 			if (!ValidationUtil.isUserNameValid(request.getUserName())) {
 				errors.add(messageSource.messageResponse("full.name.invalid"));
 			}
