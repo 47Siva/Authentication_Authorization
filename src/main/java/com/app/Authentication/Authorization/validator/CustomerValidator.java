@@ -41,7 +41,6 @@ public class CustomerValidator {
 		if (ValidationUtil.isNullOrEmpty(request.getCustomerName())) {
 			errors.add(messageService.messageResponse("register.user.name.required"));
 		} else {
-			request.setCustomerName(ValidationUtil.getFormattedString(request.getCustomerName()));
 			if (!ValidationUtil.isUserNameValid(request.getCustomerName())) {
 				errors.add(messageService.messageResponse("register.user.name.invalid"));
 			}
