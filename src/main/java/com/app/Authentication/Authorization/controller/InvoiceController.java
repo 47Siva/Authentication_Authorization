@@ -122,11 +122,11 @@ public class InvoiceController {
 	@Operation(description = "Get End Point", summary = "This is a get specific Customer Api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
-	@GetMapping("/getCustomer/{id}")
+	@GetMapping("/getCustomer/{customerEmail}")
 	public ResponseEntity<?> getCustomer(@RequestHeader HttpHeaders httpHeaders,
-			@PathVariable UUID id) {
+			@PathVariable String customerEmail) {
 		
-		ResponseEntity<?> response = customerService.getCustomer(id);
+		ResponseEntity<?> response = customerService.getCustomer(customerEmail);
 		
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {

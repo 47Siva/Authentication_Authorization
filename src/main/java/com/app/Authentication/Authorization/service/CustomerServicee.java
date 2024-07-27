@@ -99,8 +99,8 @@ public class CustomerServicee {
 		}
 	}
 
-	public ResponseEntity<?> getCustomer(UUID id) {
-		Optional<Customer> customer = customerRepository.findById(id);
+	public ResponseEntity<?> getCustomer(String customerEmail) {
+		Optional<Customer> customer = customerRepository.findByDuplicateEamil(customerEmail);
 		Map<String, Object> response = new HashMap<>();
 		if (customer.isPresent()) {
 			Customer customer2 = customer.get();
