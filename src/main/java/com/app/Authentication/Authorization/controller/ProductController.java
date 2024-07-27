@@ -59,7 +59,7 @@ public class ProductController {
 		}
 	}
 	
-	@Operation(description = "Post End Point", summary = "Add Product Api", responses = {
+	@Operation(description = "Post End Point", summary = "Add Product List Api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@PostMapping("/add/product/list")
