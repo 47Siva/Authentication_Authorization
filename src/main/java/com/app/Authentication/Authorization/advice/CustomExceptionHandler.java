@@ -11,7 +11,10 @@ import java.util.stream.Stream;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -149,7 +152,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<Object> handlUsernameNotFoundException(UsernameNotFoundException ex) {
 		Error errors = new Error();
@@ -160,5 +163,21 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		response.setError(errors);
 		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 		return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ProblemDetail handleSecurityException(Exception ex) {
+		ProblemDetail errDetail = null; 
+		if (ex instanceof BadCredentialsException) {
+			errDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), ex.getMessage());
+			errDetail.setProperty("access_denied_reason", "Authentication Failure ");
+		}
+
+		if (ex instanceof BadCredentialsException) {
+			errDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), ex.getMessage());
+			errDetail.setProperty("access_denied_reason", "Not_Authorized ");
+		}
+		
+		return errDetail;
 	}
 }
