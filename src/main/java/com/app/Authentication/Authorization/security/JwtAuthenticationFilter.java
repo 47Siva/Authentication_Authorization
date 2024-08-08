@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.app.Authentication.Authorization.response.MessageService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,9 @@ import jakarta.servlet.http.HttpServletResponse;
 //@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+	@Autowired
+	MessageService messageSource;
+	
 //	@Autowired
 	private  JwtService jwtService;
 //	@Autowired
@@ -36,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired
     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver exceptionResolver) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -52,7 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (authHeader == null || !authHeader.startsWith(TOKEN_PREFIX)) {
 				filterChain.doFilter(request, response);
 				return;
+//				throw new ServletException("Missing or invalid Authorization header");
 			}
+			
 			jwttoken = authHeader.substring(7);
 			userName = jwtService.extractUserName(jwttoken);
 			if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -67,9 +73,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-			exceptionResolver.resolveException(request, response, null, e);
+//			e.printStackTrace();
+//			logger.error(e.getMessage(), e);
+//			exceptionResolver.resolveException(request, response, null, e);
+			
+	        logger.error("Exception occurred: ", e);
+	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set appropriate status
+	        response.getWriter().write("Unauthorized: " + e.getMessage()); // Provide error message
+	        response.getWriter().flush();
 		}
 	}
 

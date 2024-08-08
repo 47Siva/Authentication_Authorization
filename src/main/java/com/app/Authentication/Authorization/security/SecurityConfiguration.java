@@ -62,6 +62,8 @@ public class  SecurityConfiguration {
                         		  "/api/invoice/**",
                         		  "/api/product/**")
                                 .permitAll()
+                                .requestMatchers("api/user/**").hasAnyRole("USER","ADMIN") // Allow access to public endpoints
+                                .requestMatchers("api/admin/**").hasRole("ADMIN") // Require ADMIN role for /admin endpoints
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(session ->
