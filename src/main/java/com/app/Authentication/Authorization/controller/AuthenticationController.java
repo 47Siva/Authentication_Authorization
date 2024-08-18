@@ -64,7 +64,6 @@ public class AuthenticationController {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@PostMapping(value = "/user/register", produces = "application/json")
-	
 	public ResponseEntity<?> userRegister(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The Signup request payload") @RequestBody UserRegisterRequest userRegisterRequest,
 			@RequestHeader HttpHeaders httpHeaders) throws Exception {

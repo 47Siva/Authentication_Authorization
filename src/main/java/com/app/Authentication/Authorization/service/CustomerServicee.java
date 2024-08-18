@@ -16,8 +16,10 @@ import com.app.Authentication.Authorization.dto.CustomerProductDto;
 import com.app.Authentication.Authorization.entity.Customer;
 import com.app.Authentication.Authorization.entity.CustomerProduct;
 import com.app.Authentication.Authorization.entity.Product;
+import com.app.Authentication.Authorization.repository.CustomerProductRepository;
 import com.app.Authentication.Authorization.repository.CustomerRepository;
 import com.app.Authentication.Authorization.repository.ProductRepository;
+import com.app.Authentication.Authorization.request.BuyProductRequest;
 import com.app.Authentication.Authorization.response.CustomerResponse;
 import com.app.Authentication.Authorization.response.InvoiceResponse;
 import com.app.Authentication.Authorization.response.MessageService;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerServicee {
 
 	private final CustomerRepository customerRepository;
+	private final CustomerProductRepository customerProductRepository;
 	private final ProductRepository productRepository;
 	private @NonNull MessageService messagePropertySource;
 
