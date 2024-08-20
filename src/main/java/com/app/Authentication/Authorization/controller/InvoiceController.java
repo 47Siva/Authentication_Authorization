@@ -61,7 +61,7 @@ public class InvoiceController {
 		ValidationResult validationResult = customerValidator.validate(RequestType.POST, request,null,null);
 		Customer customer = (Customer) validationResult.getObject();
 
-		ResponseEntity<?> response = invoiceService.buyProduct(customer, request);
+		ResponseEntity<?> response = invoiceService.buyProduct(customer, request,RequestType.POST,null);
 
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
@@ -146,10 +146,10 @@ public class InvoiceController {
 			@RequestBody BuyProductRequest buyProductRequest,
 			@PathVariable UUID id ) {
 		
-		ValidationResult validationResult = customerValidator.validate(RequestType.POST, buyProductRequest,null,id);
+		ValidationResult validationResult = customerValidator.validate(RequestType.PUT, buyProductRequest,null,id);
 		Customer customer = (Customer) validationResult.getObject();
 		
-		ResponseEntity<?> response = invoiceService.buyProduct(customer,buyProductRequest);
+		ResponseEntity<?> response = invoiceService.buyProduct(customer,buyProductRequest,RequestType.POST,id);
 		
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {
