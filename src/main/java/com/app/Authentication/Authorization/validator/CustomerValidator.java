@@ -129,11 +129,23 @@ public class CustomerValidator {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 				request.setDate(date.format(formatter));
 			}
+			if (errors.size() > 0) {
+				String errorMessage = errors.stream().map(a -> String.valueOf(a)).collect(Collectors.joining(", "));
+				throw new ObjectInvalidException(errorMessage);
+			}
+			
+			customer.setCustomerName(request.getCustomerName());
+			customer.setEmail(request.getEmail());
+			customer.setMobileNo(request.getMobileNo());
+			customer.setAddress(request.getAddress());
+			customer.setGender(request.getGender());
+			
+			result.setObject(customer);
 		}
 
 		if (requestType.equals(RequestType.POST)) {
 			if (id!=null)
-				throw new ObjectInvalidException(messageService.messageResponse("invalid.request.payload"));
+				throw new ObjectInvalidException(messageService.messageResponse("invalid.payload.request"));
 
 			if (customer != null) {
 				throw new ObjectInvalidException(messageService.messageResponse("user.exist"));
@@ -205,14 +217,14 @@ public class CustomerValidator {
 				String errorMessage = errors.stream().map(a -> String.valueOf(a)).collect(Collectors.joining(", "));
 				throw new ObjectInvalidException(errorMessage);
 			}
+			
+			customer = Customer.builder().email(request.getEmail()).address(request.getAddress())
+					.customerName(request.getCustomerName()).date(request.getDate()).mobileNo(request.getMobileNo())
+					.gender(request.getGender()).build();
+			result.setObject(customer);
 		}
 
 //		 List<CustomerProduct> customerProducts = CustomerProductConverter.convert(request.getCustomerProduct());
-
-		customer = Customer.builder().email(request.getEmail()).address(request.getAddress())
-				.customerName(request.getCustomerName()).date(request.getDate()).mobileNo(request.getMobileNo())
-				.gender(request.getGender()).build();
-		result.setObject(customer);
 		return result;
 	}
 }

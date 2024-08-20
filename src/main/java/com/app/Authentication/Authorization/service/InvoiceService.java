@@ -1,9 +1,9 @@
 package com.app.Authentication.Authorization.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import com.app.Authentication.Authorization.dto.CustomerProductDto;
 import com.app.Authentication.Authorization.entity.Customer;
 import com.app.Authentication.Authorization.entity.CustomerProduct;
 import com.app.Authentication.Authorization.entity.Product;
+import com.app.Authentication.Authorization.enumeration.RequestType;
 import com.app.Authentication.Authorization.repository.CustomerProductRepository;
 import com.app.Authentication.Authorization.repository.CustomerRepository;
 import com.app.Authentication.Authorization.repository.ProductRepository;
@@ -33,21 +34,37 @@ public class InvoiceService {
 	private final CustomerProductRepository customerProductRepository;
 	private final CustomerRepository customerRepository;
 
-	public ResponseEntity<?> buyProduct(Customer customer, BuyProductRequest request) {
+	public ResponseEntity<?> buyProduct(Customer customer, BuyProductRequest request, RequestType requestType,
+			UUID id) {
 
-		if (customer == null) {
-			throw new IllegalArgumentException(messageSource.messageResponse("customer.required"));
+		Customer customerEntity = null;
+		if (RequestType.PUT.equals(requestType)) {
+			Optional<Customer> customerData = customerRepository.findById(id);
+			if (customerData.isPresent()) {
+				customerEntity = customerData.get();
+				// Update the existing customer's fields with the new values
+				customerEntity.setCustomerName(customer.getCustomerName());
+				customerEntity.setAddress(customer.getAddress());
+				customerEntity.setDate(customer.getDate());
+				customerEntity.setEmail(customer.getEmail());
+				customerEntity.setGender(customer.getGender());
+				customerEntity.setMobileNo(customer.getMobileNo());
+			}
 		}
-
-		Customer customerEntity = Customer.builder().customerName(customer.getCustomerName())
-				.address(customer.getAddress()).date(customer.getDate()).email(customer.getEmail())
-				.gender(customer.getGender()).mobileNo(customer.getMobileNo()).build();
+		if (RequestType.POST.equals(requestType)) {
+			// Create a new Customer entity
+			customerEntity = Customer.builder().customerName(customer.getCustomerName()).address(customer.getAddress())
+					.date(customer.getDate()).email(customer.getEmail()).gender(customer.getGender())
+					.mobileNo(customer.getMobileNo()).build();
+		}
 
 		double totalProductAmount = 0d;
 		double singleProductAmount = 0d;
 		int availableQuantity = 0;
 
-		List<CustomerProduct> productlist = new ArrayList<>();
+		List<CustomerProduct> productlist = customerEntity.getCustomerProducet() != null
+				? new ArrayList<>(customerEntity.getCustomerProducet())
+				: new ArrayList<>();
 		for (CustomerProductRequest product : request.getCustomerProduct()) {
 			Optional<Product> product1 = productRepository.findByName(product.getProductName());
 
@@ -74,6 +91,7 @@ public class InvoiceService {
 				productRepository.save(productobj);
 				availableQuantity = 0;
 
+				// Check if the product already exists in the customer's list
 				boolean productExists = false;
 				for (CustomerProduct customerProduct : productlist) {
 					if (customerProduct.getProductName().equals(productobj.getProductName())) {
@@ -85,6 +103,7 @@ public class InvoiceService {
 				}
 
 				if (!productExists) {
+					// Add the new product to the customer's list
 					CustomerProduct customerProduct = CustomerProduct.builder().price(productobj.getPrice())
 							.productName(productobj.getProductName()).quantity(product.getQuantity())
 							.totalAmount(singleProductAmount).build();
@@ -95,9 +114,12 @@ public class InvoiceService {
 				throw new NullPointerException(error);
 			}
 		}
+		
+		// Update the customer's product list
 		customerEntity.setCustomerProducet(productlist);
 		Customer customerData = customerRepository.save(customerEntity);
 
+		// Calculate GST, discount, and grand total
 		String Gststr = "5%";
 		String shopDiscountStr = "2%";
 		double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
@@ -106,10 +128,10 @@ public class InvoiceService {
 		double discountAmount = shopDiscount * totalProductAmount;
 		double grandTotal = totalProductAmount + GstAmount - discountAmount;
 
+	    // Prepare the response DTO
 		CustomerAndProductDto customerdto = CustomerAndProductDto.builder().customerName(customerData.getCustomerName())
-				.date(customerData.getDate()).email(customerData.getEmail())
-				.address(customerData.getAddress()).gender(customerData.getGender()).id(customerData.getId())
-				.mobileNo(customerData.getMobileNo()).build();
+				.date(customerData.getDate()).email(customerData.getEmail()).address(customerData.getAddress())
+				.gender(customerData.getGender()).id(customerData.getId()).mobileNo(customerData.getMobileNo()).build();
 		List<CustomerProductDto> productDto = new ArrayList<>();
 		for (CustomerProduct dto2 : customerData.getCustomerProducet()) {
 			CustomerProductDto customerProductDto = CustomerProductDto.builder().id(dto2.getId()).price(dto2.getPrice())
@@ -119,9 +141,11 @@ public class InvoiceService {
 		}
 		customerdto.setCustomerProducts(productDto);
 
-		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).gst(Gststr).shopDiscount(shopDiscountStr)
-				.gstAmount(GstAmount).discountAmount(discountAmount).grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount)
-				.build();
+
+	    // Build the invoice response
+		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).gst(Gststr)
+				.shopDiscount(shopDiscountStr).gstAmount(GstAmount).discountAmount(discountAmount)
+				.grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();
 
 		return ResponseEntity.ok(invoiceResponse);
 	}
