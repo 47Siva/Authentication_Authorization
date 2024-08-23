@@ -8,8 +8,6 @@ import lombok.Data;
 @Data
 @Builder
 public class CustomerProductDto {
-
-	private UUID id;
 	
 	private String productName;
 	

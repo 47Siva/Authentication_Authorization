@@ -149,7 +149,7 @@ public class InvoiceController {
 		ValidationResult validationResult = customerValidator.validate(RequestType.PUT, buyProductRequest,null,id);
 		Customer customer = (Customer) validationResult.getObject();
 		
-		ResponseEntity<?> response = invoiceService.buyProduct(customer,buyProductRequest,RequestType.POST,id);
+		ResponseEntity<?> response = invoiceService.buyProduct(customer,buyProductRequest,RequestType.PUT,id);
 		
 		TransactionContext context = responseGenerator.generateTransationContext(httpHeaders);
 		try {

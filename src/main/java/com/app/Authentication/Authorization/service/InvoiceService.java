@@ -65,6 +65,7 @@ public class InvoiceService {
 		List<CustomerProduct> productlist = customerEntity.getCustomerProducet() != null
 				? new ArrayList<>(customerEntity.getCustomerProducet())
 				: new ArrayList<>();
+		List<CustomerProduct> currentProductList = new ArrayList<>();
 		for (CustomerProductRequest product : request.getCustomerProduct()) {
 			Optional<Product> product1 = productRepository.findByName(product.getProductName());
 
@@ -108,6 +109,15 @@ public class InvoiceService {
 							.productName(productobj.getProductName()).quantity(product.getQuantity())
 							.totalAmount(singleProductAmount).build();
 					productlist.add(customerProduct);
+					currentProductList.add(customerProduct);
+				}else {
+					// Add the updated product to the current transaction list
+					for (CustomerProduct existingProduct : productlist) {
+						if (existingProduct.getProductName().equals(productobj.getProductName())) {
+							currentProductList.add(existingProduct);
+							break;
+						}
+					}
 				}
 			} else {
 				String error = messageSource.messageResponse("product.not.valid");
@@ -133,9 +143,12 @@ public class InvoiceService {
 				.date(customerData.getDate()).email(customerData.getEmail()).address(customerData.getAddress())
 				.gender(customerData.getGender()).id(customerData.getId()).mobileNo(customerData.getMobileNo()).build();
 		List<CustomerProductDto> productDto = new ArrayList<>();
-		for (CustomerProduct dto2 : customerData.getCustomerProducet()) {
-			CustomerProductDto customerProductDto = CustomerProductDto.builder().id(dto2.getId()).price(dto2.getPrice())
-					.productName(dto2.getProductName()).quantity(dto2.getQuantity()).totalAmount(dto2.getTotalAmount())
+		for (CustomerProduct currentProduct : currentProductList) {
+			CustomerProductDto customerProductDto = CustomerProductDto.builder()
+					.price(currentProduct.getPrice())
+					.productName(currentProduct.getProductName())
+					.quantity(currentProduct.getQuantity())
+					.totalAmount(currentProduct.getTotalAmount())
 					.build();
 			productDto.add(customerProductDto);
 		}

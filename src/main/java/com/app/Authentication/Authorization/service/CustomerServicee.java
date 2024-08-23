@@ -89,7 +89,7 @@ public class CustomerServicee {
 				List<CustomerProductDto> customerProductList = new ArrayList<>();
 				for (CustomerProduct customerProductObj : customerObj.getCustomerProducet()) {
 					CustomerProductDto dto2 = CustomerProductDto.builder()
-							.id(customerProductObj.getId()).price(customerProductObj.getPrice())
+							.price(customerProductObj.getPrice())
 							.productName(customerProductObj.getProductName())
 							.quantity(customerProductObj.getQuantity()).totalAmount(customerProductObj.getTotalAmount())
 							.build();
@@ -120,7 +120,7 @@ public class CustomerServicee {
 			ArrayList<CustomerProductDto> dtolist = new ArrayList<>();
 			List<CustomerProduct> customerProduct = customer2.getCustomerProducet();
 			for (CustomerProduct obj : customerProduct) {
-				CustomerProductDto customerProductDto = CustomerProductDto.builder().id(obj.getId())
+				CustomerProductDto customerProductDto = CustomerProductDto.builder()
 						.price(obj.getPrice()).productName(obj.getProductName()).quantity(obj.getQuantity())
 						.totalAmount(obj.getTotalAmount()).build();
 				Optional<Product> product1 = productRepository.findByName(obj.getProductName());

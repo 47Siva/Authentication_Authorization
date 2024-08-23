@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 		license = @License(name = "Licence name",url = "https//some-url.com"),
 		termsOfService = "terms and service"),
 		servers = {
-		@Server(description ="http",url ="http://localhost:8080")
+		@Server(description ="http",url ="http://localhost:8081")
 		}
 )
 @SecurityScheme(
