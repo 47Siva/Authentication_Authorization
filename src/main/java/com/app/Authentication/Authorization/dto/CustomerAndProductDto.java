@@ -26,8 +26,6 @@ public class CustomerAndProductDto {
 	
 	private String address;
 	
-	private String date ;
-	
 	private GenderType gender;
 	
 	private List<CustomerProductDto> customerProducts;

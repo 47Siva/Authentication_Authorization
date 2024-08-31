@@ -71,17 +71,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 	}
 
-	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
-		Error errors = new Error();
-		errors.setErrorList((Stream.of(ex.getMessage().split(",")).collect(Collectors.toList())));
-		errors.setReason(ex.getMessage());
-		errors.setCode(HttpStatus.CONFLICT.toString());
-		Response response = new Response();
-		response.setError(errors);
-		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
-		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-	}
+//	@ExceptionHandler(RuntimeException.class)
+//	public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
+//		Error errors = new Error();
+//		errors.setErrorList((Stream.of(ex.getMessage().split(",")).collect(Collectors.toList())));
+//		errors.setReason(ex.getMessage());
+//		errors.setCode(HttpStatus.CONFLICT.toString());
+//		Response response = new Response();
+//		response.setError(errors);
+//		response.setTimeStamp(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+//		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+//	}
 
 	@ExceptionHandler(NullPointerException.class)
 	public ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {

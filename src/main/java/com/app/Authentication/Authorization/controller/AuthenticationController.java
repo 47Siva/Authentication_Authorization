@@ -76,6 +76,7 @@ public class AuthenticationController {
 		Map<String, Object> response = new HashMap<>();
 		final String token = jwtService.generateToken(userservice);
 		response.put("Status", 1);
+		response.put("UserId", userservice.getId());
 		response.put("message", "You have register successfully.");
 		response.put("token", token);
 

@@ -119,7 +119,9 @@ public class ValidationUtil {
 	
 	public static boolean isRoleValid(Role role) {
 		String roleTypetoString = role.toString();
-		return roleTypetoString.equalsIgnoreCase("admin") || roleTypetoString.equalsIgnoreCase("user");
+		return roleTypetoString.equalsIgnoreCase("admin") 
+				|| roleTypetoString.equalsIgnoreCase("user") 
+				|| roleTypetoString.equalsIgnoreCase("customer");
 	}
 
 	

@@ -160,11 +160,11 @@ public class UserValidator {
 			Optional<User> findbyrole=userService.findByUserRoleType(admin);
 		
 			
-			user = User.builder().userName(request.getUserName())
+			user = User.builder().applicationUserName(request.getUserName())
 					.userRole(request.getUserRole()).email(request.getEmail())
-					.userName(request.getUserName()).password(encrptPassword).mobileNo(request.getMobileNo()).build();
+					.password(encrptPassword).mobileNo(request.getMobileNo()).build();
 		} else {
-			user.setUserName(request.getUserName());
+			user.setApplicationUserName(request.getUserName());
 			user.setUserRole(request.getUserRole());
 			user.setEmail(request.getEmail());
 			user.setMobileNo(request.getMobileNo());

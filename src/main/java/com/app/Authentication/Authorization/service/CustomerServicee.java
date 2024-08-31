@@ -58,7 +58,7 @@ public class CustomerServicee {
 		} else {
 			for (Customer customerObj : customerData) {
 				CustomerResponse customer = CustomerResponse.builder().id(customerObj.getId())
-						.customerName(customerObj.getCustomerName()).date(customerObj.getDate())
+						.customerName(customerObj.getCustomerName())
 						.address(customerObj.getAddress()).email(customerObj.getEmail()).gender(customerObj.getGender())
 						.mobileNo(customerObj.getMobileNo()).build();
 				customerResponses.add(customer);
@@ -83,7 +83,7 @@ public class CustomerServicee {
 
 			for (Customer customerObj : customerData) {
 				CustomerAndProductDto dto = CustomerAndProductDto.builder().customerName(customerObj.getCustomerName())
-						.date(customerObj.getDate()).email(customerObj.getEmail()).gender(customerObj.getGender())
+						.email(customerObj.getEmail()).gender(customerObj.getGender())
 						.id(customerObj.getId()).mobileNo(customerObj.getMobileNo()).address(customerObj.getAddress())
 						.build();
 				List<CustomerProductDto> customerProductList = new ArrayList<>();
@@ -109,19 +109,19 @@ public class CustomerServicee {
 			Customer customer2 = customer.get();
 
 			CustomerAndProductDto customerAndProductDto = CustomerAndProductDto.builder().id(customer2.getId())
-					.address(customer2.getAddress()).customerName(customer2.getCustomerName()).date(customer2.getDate())
+					.address(customer2.getAddress()).customerName(customer2.getCustomerName())
 					.email(customer2.getEmail()).gender(customer2.getGender()).mobileNo(customer2.getMobileNo())
 					.customerProducts(null).build();
 
 			double totalProductAmount = 0d;
 			double singleProductAmount = 0d;
-			int availableQuantity = 0;
+//			int availableQuantity = 0;
 
 			ArrayList<CustomerProductDto> dtolist = new ArrayList<>();
 			List<CustomerProduct> customerProduct = customer2.getCustomerProducet();
 			for (CustomerProduct obj : customerProduct) {
 				CustomerProductDto customerProductDto = CustomerProductDto.builder()
-						.price(obj.getPrice()).productName(obj.getProductName()).quantity(obj.getQuantity())
+						.price(obj.getPrice()).productName(obj.getProductName()).date(obj.getDate()).quantity(obj.getQuantity())
 						.totalAmount(obj.getTotalAmount()).build();
 				Optional<Product> product1 = productRepository.findByName(obj.getProductName());
 				Product productobj = product1.get();

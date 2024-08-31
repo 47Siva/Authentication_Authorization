@@ -127,7 +127,7 @@ public class RegisterValidator {
 		}
 
 		user = User.builder().email(request.getEmail()).mobileNo(request.getMobileNo()).password(request.getPassword())
-				.userName(request.getUserName()).userRole(request.getUserRole()).build();
+				.applicationUserName(request.getUserName()).userRole(request.getUserRole()).build();
 
 		result.setObject(user);
 		return result;

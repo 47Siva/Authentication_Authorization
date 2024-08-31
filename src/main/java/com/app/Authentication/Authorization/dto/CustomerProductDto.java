@@ -11,6 +11,8 @@ public class CustomerProductDto {
 	
 	private String productName;
 	
+	private String date;
+	
 	private int quantity;
 	
 	private double price;

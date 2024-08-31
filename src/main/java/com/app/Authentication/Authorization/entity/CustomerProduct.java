@@ -29,6 +29,9 @@ public class CustomerProduct extends AuditwithBaseEntity implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	private UUID id;
+	
+	@Column(name = "date")
+	private String date;
 
 	@Column(name = "product_name")
 	private String productName;

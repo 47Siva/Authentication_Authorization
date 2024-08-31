@@ -31,7 +31,7 @@ public class AdminService {
 	public User createAdmin(User user) {
 		var adminobj = User.builder().email(user.getEmail()).mobileNo(user.getMobileNo())
 				.password(PasswordUtil.getEncryptedPassword(user.getPassword())).userRole(Role.ADMIN)
-				.status(Status.ACTIVE).userName(user.getUsername()).build();
+				.status(Status.ACTIVE).applicationUserName(user.getUsername()).build();
 		return userRepository.saveAndFlush(adminobj);
 	}
 
