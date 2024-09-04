@@ -57,10 +57,20 @@ public class UserService implements UserDetailsService {
 		if (user.getUserRole() == null) {
 			throw new IllegalArgumentException("Role cannot be null");
 		}
-		var userobj = User.builder().email(user.getEmail()).mobileNo(user.getMobileNo())
-				.password(PasswordUtil.getEncryptedPassword(user.getPassword())).userRole(user.getUserRole())
-				.status(Status.ACTIVE).userName(user.getUsername()).build();
-		return userRepository.saveAndFlush(userobj);
+		String enpassword = PasswordUtil.getEncryptedPassword(user.getPassword());
+
+		User userobj = User.builder().email(user.getEmail()).mobileNo(user.getMobileNo())
+				.password(enpassword).userRole(user.getUserRole())
+				.status(Status.ACTIVE).applicationUserName(user.getUsername()).build();
+		User savedUser = userRepository.saveAndFlush(userobj);
+		if (user.getUserRole().equals(Role.CUSTOMER)) {
+			var customer = Customer.builder().email(userobj.getEmail()).mobileNo(userobj.getMobileNo())
+					.customerName(userobj.getApplicationUserName()).status(userobj.getStatus())
+					.userId(savedUser.getId()).build();
+			customerRepository.save(customer);
+		}
+		
+		return savedUser;
 	}
 
 	public Optional<User> findByUserName(String userName) {

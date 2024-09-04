@@ -5,8 +5,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.app.Authentication.Authorization.auditing.AuditwithBaseEntity;
 import com.app.Authentication.Authorization.enumeration.GenderType;
+import com.app.Authentication.Authorization.enumeration.Status;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,6 +43,7 @@ public class Customer extends AuditwithBaseEntity implements Serializable{
 
 	private UUID id;
 
+	@JdbcTypeCode(SqlTypes.CHAR)
 	@Column(name = "user_id")
 	private UUID userId;
 	
@@ -54,12 +59,13 @@ public class Customer extends AuditwithBaseEntity implements Serializable{
 	@Column(name = "address")
 	private String address;
 	
-	@Column(name = "date")
-	private String date;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "gender")
 	private GenderType gender;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status")
+	private Status status;
 	
 	@OneToMany(targetEntity = CustomerProduct.class,cascade = {CascadeType.ALL})
 	@JoinColumn(name = "customer_id",referencedColumnName = "id")

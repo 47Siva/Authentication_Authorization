@@ -121,14 +121,6 @@ public class CustomerValidator {
 					errors.add(messageService.messageResponse("register.gender.invalid"));
 				}
 			}
-
-			if (request.getDate() != null) {
-				request.setDate(request.getDate());
-			} else {
-				LocalDate date = LocalDate.now();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				request.setDate(date.format(formatter));
-			}
 			if (errors.size() > 0) {
 				String errorMessage = errors.stream().map(a -> String.valueOf(a)).collect(Collectors.joining(", "));
 				throw new ObjectInvalidException(errorMessage);
@@ -167,10 +159,10 @@ public class CustomerValidator {
 				}
 			}
 
-			Optional<Customer> userDuplicateMailObj = customerService.findByDuplicateEmail(request.getEmail());
-			if (userDuplicateMailObj.isPresent()) {
-				errors.add(messageService.messageResponse("user.register.email.duplicate"));
-			}
+//			Optional<Customer> userDuplicateMailObj = customerService.findByDuplicateEmail(request.getEmail());
+//			if (userDuplicateMailObj.isPresent()) {
+//				errors.add(messageService.messageResponse("user.register.email.duplicate"));
+//			}
 
 			if (ValidationUtil.isNullOrEmpty(request.getMobileNo())) {
 				errors.add(messageService.messageResponse("register.mobile.required"));
@@ -190,11 +182,11 @@ public class CustomerValidator {
 				}
 			}
 
-			Optional<Customer> userExist = customerService.getMobileNos(request.getMobileNo());
-			if (userExist.isPresent()) {
-				String[] params = new String[] { request.getMobileNo() };
-				errors.add(messageService.messageResponse("register.mobileno.exist", params));
-			}
+//			Optional<Customer> userExist = customerService.getMobileNos(request.getMobileNo());
+//			if (userExist.isPresent()) {
+//				String[] params = new String[] { request.getMobileNo() };
+//				errors.add(messageService.messageResponse("register.mobileno.exist", params));
+//			}
 
 			if (ValidationUtil.isGenderrequired(request.getGender())) {
 				errors.add(messageService.messageResponse("register.gender.required"));
@@ -205,21 +197,13 @@ public class CustomerValidator {
 				}
 			}
 
-			if (request.getDate() != null) {
-				request.setDate(request.getDate());
-			} else {
-				LocalDate date = LocalDate.now();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				request.setDate(date.format(formatter));
-			}
-
 			if (errors.size() > 0) {
 				String errorMessage = errors.stream().map(a -> String.valueOf(a)).collect(Collectors.joining(", "));
 				throw new ObjectInvalidException(errorMessage);
 			}
 			
 			customer = Customer.builder().email(request.getEmail()).address(request.getAddress())
-					.customerName(request.getCustomerName()).date(request.getDate()).mobileNo(request.getMobileNo())
+					.customerName(request.getCustomerName()).mobileNo(request.getMobileNo())
 					.gender(request.getGender()).build();
 			result.setObject(customer);
 		}

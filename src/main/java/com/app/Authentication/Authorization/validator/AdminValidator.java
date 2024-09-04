@@ -101,7 +101,7 @@ public class AdminValidator {
 		}
 
 		user = User.builder().email(request.getEmail()).mobileNo(request.getMobileNo()).password(request.getPassword())
-				.userName(request.getUserName()).build();
+				.applicationUserName(request.getUserName()).build();
 
 		result.setObject(user);
 		return result;

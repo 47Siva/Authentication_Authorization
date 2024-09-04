@@ -1,5 +1,8 @@
 package com.app.Authentication.Authorization.service;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,17 +48,25 @@ public class InvoiceService {
 				// Update the existing customer's fields with the new values
 				customerEntity.setCustomerName(customer.getCustomerName());
 				customerEntity.setAddress(customer.getAddress());
-				customerEntity.setDate(customer.getDate());
 				customerEntity.setEmail(customer.getEmail());
 				customerEntity.setGender(customer.getGender());
 				customerEntity.setMobileNo(customer.getMobileNo());
 			}
 		}
 		if (RequestType.POST.equals(requestType)) {
-			// Create a new Customer entity
-			customerEntity = Customer.builder().customerName(customer.getCustomerName()).address(customer.getAddress())
-					.date(customer.getDate()).email(customer.getEmail()).gender(customer.getGender())
-					.mobileNo(customer.getMobileNo()).build();
+			Optional<Customer> customerData = customerRepository.findByUserId(request.getUserId());
+			if (customerData.isPresent()) {
+				customerEntity = customerData.get();
+				// Create a new Customer entity
+				customerEntity.setAddress(request.getAddress());
+				customerEntity.setCustomerName(request.getCustomerName());
+				customerEntity.setEmail(request.getEmail());
+				customerEntity.setGender(request.getGender());
+				customerEntity.setMobileNo(request.getMobileNo());
+			} else {
+				String error = messageSource.messageResponse("user.not.register");
+				throw new NullPointerException(error);
+			}
 		}
 
 		double totalProductAmount = 0d;
@@ -96,6 +107,14 @@ public class InvoiceService {
 				boolean productExists = false;
 				for (CustomerProduct customerProduct : productlist) {
 					if (customerProduct.getProductName().equals(productobj.getProductName())) {
+						if (product.getDate() != null) {
+							product.setDate(product.getDate());
+						} else {
+							LocalDate date = LocalDate.now();
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							product.setDate(date.format(formatter));
+						}
+						customerProduct.setDate(product.getDate());
 						customerProduct.setQuantity(customerProduct.getQuantity() + product.getQuantity());
 						customerProduct.setTotalAmount(customerProduct.getTotalAmount() + singleProductAmount);
 						productExists = true;
@@ -104,13 +123,20 @@ public class InvoiceService {
 				}
 
 				if (!productExists) {
+					if (product.getDate() != null) {
+						product.setDate(product.getDate());
+					} else {
+						LocalDate date = LocalDate.now();
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						product.setDate(date.format(formatter));
+					}
 					// Add the new product to the customer's list
 					CustomerProduct customerProduct = CustomerProduct.builder().price(productobj.getPrice())
-							.productName(productobj.getProductName()).quantity(product.getQuantity())
-							.totalAmount(singleProductAmount).build();
+							.productName(productobj.getProductName()).date(product.getDate())
+							.quantity(product.getQuantity()).totalAmount(singleProductAmount).build();
 					productlist.add(customerProduct);
 					currentProductList.add(customerProduct);
-				}else {
+				} else {
 					// Add the updated product to the current transaction list
 					for (CustomerProduct existingProduct : productlist) {
 						if (existingProduct.getProductName().equals(productobj.getProductName())) {
@@ -124,7 +150,7 @@ public class InvoiceService {
 				throw new NullPointerException(error);
 			}
 		}
-		
+
 		// Update the customer's product list
 		customerEntity.setCustomerProducet(productlist);
 		Customer customerData = customerRepository.save(customerEntity);
@@ -138,24 +164,20 @@ public class InvoiceService {
 		double discountAmount = shopDiscount * totalProductAmount;
 		double grandTotal = totalProductAmount + GstAmount - discountAmount;
 
-	    // Prepare the response DTO
+		// Prepare the response DTO
 		CustomerAndProductDto customerdto = CustomerAndProductDto.builder().customerName(customerData.getCustomerName())
-				.date(customerData.getDate()).email(customerData.getEmail()).address(customerData.getAddress())
+				.userId(customerData.getUserId()).email(customerData.getEmail()).address(customerData.getAddress())
 				.gender(customerData.getGender()).id(customerData.getId()).mobileNo(customerData.getMobileNo()).build();
 		List<CustomerProductDto> productDto = new ArrayList<>();
 		for (CustomerProduct currentProduct : currentProductList) {
-			CustomerProductDto customerProductDto = CustomerProductDto.builder()
-					.price(currentProduct.getPrice())
-					.productName(currentProduct.getProductName())
-					.quantity(currentProduct.getQuantity())
-					.totalAmount(currentProduct.getTotalAmount())
-					.build();
+			CustomerProductDto customerProductDto = CustomerProductDto.builder().price(currentProduct.getPrice())
+					.date(currentProduct.getDate()).productName(currentProduct.getProductName())
+					.quantity(currentProduct.getQuantity()).totalAmount(currentProduct.getTotalAmount()).build();
 			productDto.add(customerProductDto);
 		}
 		customerdto.setCustomerProducts(productDto);
 
-
-	    // Build the invoice response
+		// Build the invoice response
 		InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerdto).gst(Gststr)
 				.shopDiscount(shopDiscountStr).gstAmount(GstAmount).discountAmount(discountAmount)
 				.grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();

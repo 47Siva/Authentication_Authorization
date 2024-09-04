@@ -46,7 +46,7 @@ public class User extends AuditwithBaseEntity implements UserDetails, Serializab
 	private UUID id;
 
 	@Column(name = "user_name")
-	private String userName;
+	private String applicationUserName;
 
 	@Column(name = "email")
 	private String email;
@@ -83,7 +83,7 @@ public class User extends AuditwithBaseEntity implements UserDetails, Serializab
 
 	@Override
 	public String getUsername() {
-		return userName;
+		return email;
 	}
 
 	@Override
