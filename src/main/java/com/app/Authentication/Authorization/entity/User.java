@@ -15,12 +15,11 @@ import com.app.Authentication.Authorization.enumeration.Role;
 import com.app.Authentication.Authorization.enumeration.Status;
 import com.app.Authentication.Authorization.util.PasswordUtil;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -38,6 +37,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "user_details")
+@Schema(description = "Details about the user")
 public class User extends AuditwithBaseEntity implements UserDetails, Serializable {
 
 	@Serial
