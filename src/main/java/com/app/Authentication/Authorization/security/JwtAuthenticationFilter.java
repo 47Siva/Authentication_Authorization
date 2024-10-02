@@ -73,14 +73,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-//			e.printStackTrace();
-//			logger.error(e.getMessage(), e);
-//			exceptionResolver.resolveException(request, response, null, e);
-			
-	        logger.error("Exception occurred: ", e);
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set appropriate status
-	        response.getWriter().write("Unauthorized: " + e.getMessage()); // Provide error message
-	        response.getWriter().flush();
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			exceptionResolver.resolveException(request, response, null, e);
+//			
+//	        logger.error("Exception occurred: ", e);
+//	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set appropriate status
+//	        response.getWriter().write("Unauthorized: " + e.getMessage()); // Provide error message
+//	        response.getWriter().flush();
 		}
 	}
 

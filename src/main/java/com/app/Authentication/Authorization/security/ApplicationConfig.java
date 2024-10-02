@@ -39,7 +39,7 @@ public class ApplicationConfig {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        		Optional<User> userOptional = userRepository.findByUserName(username);
+        		Optional<User> userOptional = userRepository.findByUserEmail(username);
         		if (!userOptional.isPresent()) {
         			throw new UsernameNotFoundException("User not found from the token with username: " + username);
         		}

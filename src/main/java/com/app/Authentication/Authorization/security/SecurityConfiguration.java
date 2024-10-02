@@ -62,8 +62,6 @@ public class  SecurityConfiguration {
                         		  "/api/invoice/**",
                         		  "/api/product/**")
                                 .permitAll()
-                                .requestMatchers("api/user/**").hasAnyRole("USER","ADMIN") // Allow access to public endpoints
-                                .requestMatchers("api/admin/**").hasRole("ADMIN") // Require ADMIN role for /admin endpoints
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(session ->
@@ -75,20 +73,20 @@ public class  SecurityConfiguration {
     }
     
    
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        	.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth ->
-                auth.requestMatchers("api/user/**").hasAnyRole("USER","ADMIN") // Allow access to public endpoints
-                .requestMatchers("api/admin/**").hasRole("ADMIN") // Require ADMIN role for /admin endpoints
-                .anyRequest().authenticated()) // Require authentication for any other endpoint
-            
-            .formLogin(form -> form // Enable form-based login
-                .permitAll()) // Allow anyone to access login page
-            .logout(logut -> logut // Enable logout
-                .logoutSuccessUrl("/login?logout") // Redirect to login page after logout
-                .permitAll()); // Allow anyone to access logout endpoint
-        
-    }
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http
+//        	.csrf(AbstractHttpConfigurer::disable)
+//            .authorizeHttpRequests(auth ->
+//                auth.requestMatchers("api/user/**").hasAnyRole("USER","ADMIN") // Allow access to public endpoints
+//                .requestMatchers("api/admin/**").hasRole("ADMIN") // Require ADMIN role for /admin endpoints
+//                .anyRequest().authenticated()) // Require authentication for any other endpoint
+//            
+//            .formLogin(form -> form // Enable form-based login
+//                .permitAll()) // Allow anyone to access login page
+//            .logout(logut -> logut // Enable logout
+//                .logoutSuccessUrl("/login?logout") // Redirect to login page after logout
+//                .permitAll()); // Allow anyone to access logout endpoint
+//        
+//    }
 
 }

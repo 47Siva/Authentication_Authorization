@@ -33,6 +33,8 @@ import com.app.Authentication.Authorization.validator.UserValidator;
 import com.app.Authentication.Authorization.validator.ValidationResult;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
@@ -55,7 +57,8 @@ public class UserController {
 
 
 	@Operation(description = "Get End Point", summary = "Allows to fetch user by user name.", responses = {
-			@ApiResponse(description = "Success", responseCode = "200"),
+			@ApiResponse(description = "Success", responseCode = "200",
+					content = @Content(mediaType = "application/json",schema = @Schema(implementation = User.class))),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@GetMapping(value = "/getUser/{useremail}" , produces = "application/json")
 	public ResponseEntity<?>getUser(@PathVariable ("useremail") String useremail ,@RequestHeader("Authorization") String auth){
