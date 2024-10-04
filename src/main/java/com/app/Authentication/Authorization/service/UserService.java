@@ -2,6 +2,7 @@ package com.app.Authentication.Authorization.service;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,13 +166,35 @@ public class UserService implements UserDetailsService {
 		if (useremail.equals(userdetails2.get().getEmail())) {
 			if (userdetails2.isPresent()) {
 				User user = userdetails2.get();
+				
+				// Check if the email matches
+		        if (!useremail.equals(user.getEmail())) {
+		            return ResponseEntity.badRequest().body(Map.of(
+		                "Status", HttpStatus.BAD_REQUEST.toString(),
+		                "message", "User bad request. Please enter valid data.",
+		                "Error", HttpStatus.BAD_REQUEST
+		            ));
+		        }
+		        
+		     // Define acceptable roles
+		        List<Role> acceptableRoles = Arrays.asList(Role.USER, Role.ADMIN,Role.CUSTOMER);
+		        
+		     // Check if the user's role is in the acceptable roles
+		        if (!acceptableRoles.contains(user.getUserRole())) {
+		            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+		                "Status", HttpStatus.FORBIDDEN.toString(),
+		                "message", "User does not have permission to access this request. Allowed roles: " + acceptableRoles,
+		                "Error", HttpStatus.FORBIDDEN
+		            ));
+		        }
 
-				if (!user.getUserRole().equals(Role.USER)) {
-					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
-					response.put("message", "User can't access the request");
-					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
-					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
-				}
+//				if (!user.getUserRole().equals(Role.USER)) {
+//					response.put("Status", HttpStatus.NOT_ACCEPTABLE.toString());
+//					response.put("message", "User can't access the request");
+//					response.put("Error", HttpStatus.NOT_ACCEPTABLE);
+//					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+//				}
+		        
 				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail())
 						.userName(user.getUsername()).mobileNo(user.getMobileNo()).status(user.getStatus())
 						.userRole(user.getUserRole()).build();
