@@ -75,7 +75,7 @@ public class AuthenticationService {
 		response.put("message", "Logged in successfully.!");
 		response.put("jwt", token);
 		response.put("userId", user.getId());
-		response.put("userName", user.getUsername());
+		response.put("userName", user.getApplicationUserName());
 		response.put("userEmail", user.getEmail());
 		response.put("role", user.getUserRole());
 
