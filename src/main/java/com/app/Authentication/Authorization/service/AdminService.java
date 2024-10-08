@@ -48,7 +48,7 @@ public class AdminService {
 			Optional<User> userdetails = userRepository.findByUserEmail(useremail);
 			if (userdetails.isPresent()) {
 				User user = userdetails.get();
-				UserResponse userresponse = UserResponse.builder().email(user.getEmail()).userName(user.getUsername())
+				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail()).userName(user.getApplicationUserName())
 						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
 
 				// Retrieve user details

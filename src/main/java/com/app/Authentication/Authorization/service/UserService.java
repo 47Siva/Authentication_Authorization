@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
 
 		User userobj = User.builder().email(user.getEmail()).mobileNo(user.getMobileNo())
 				.password(enpassword).userRole(user.getUserRole())
-				.status(Status.ACTIVE).applicationUserName(user.getUsername()).build();
+				.status(Status.ACTIVE).applicationUserName(user.getApplicationUserName()).build();
 		User savedUser = userRepository.saveAndFlush(userobj);
 		if (user.getUserRole().equals(Role.CUSTOMER)) {
 			var customer = Customer.builder().email(userobj.getEmail()).mobileNo(userobj.getMobileNo())
@@ -116,7 +116,7 @@ public class UserService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<User> userOptional = userRepository.findByUserName(username);
+		Optional<User> userOptional = userRepository.findByUserEmail(username);
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
@@ -148,7 +148,7 @@ public class UserService implements UserDetailsService {
 		return ResponseEntity.ok(userResponses);
 	}
 
-	@PreAuthorize("hasRole('USER')")
+	
 	public ResponseEntity<?> getuserDetailsUserNameFromToken(String useremail, String auth) throws SignatureException {
 
 		// Construct response
@@ -162,7 +162,7 @@ public class UserService implements UserDetailsService {
 		}
 
 		// Optional<User> userdetails1 = userRepository.findByUserName(useremail);
-		Optional<User> userdetails2 = userRepository.findByUserName(tokenName);
+		Optional<User> userdetails2 = userRepository.findByUserEmail(tokenName);
 		if (useremail.equals(userdetails2.get().getEmail())) {
 			if (userdetails2.isPresent()) {
 				User user = userdetails2.get();
@@ -196,11 +196,11 @@ public class UserService implements UserDetailsService {
 //				}
 		        
 				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail())
-						.userName(user.getUsername()).mobileNo(user.getMobileNo()).status(user.getStatus())
+						.userName(user.getApplicationUserName()).mobileNo(user.getMobileNo()).status(user.getStatus())
 						.userRole(user.getUserRole()).build();
 
 				// Retrieve user details
-				UserDetails userDetails = loadUserByUsername(userdetails2.get().getUsername());
+				UserDetails userDetails = loadUserByUsername(userdetails2.get().getEmail());
 				response.put("Authorities", userDetails.getAuthorities());
 				response.put("Details", userresponse);
 				return ResponseEntity.ok(response);

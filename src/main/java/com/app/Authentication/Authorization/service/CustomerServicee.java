@@ -58,6 +58,7 @@ public class CustomerServicee {
 		} else {
 			for (Customer customerObj : customerData) {
 				CustomerResponse customer = CustomerResponse.builder().id(customerObj.getId())
+						.userId(customerObj.getUserId())
 						.customerName(customerObj.getCustomerName())
 						.address(customerObj.getAddress()).email(customerObj.getEmail()).gender(customerObj.getGender())
 						.mobileNo(customerObj.getMobileNo()).build();
@@ -83,7 +84,7 @@ public class CustomerServicee {
 
 			for (Customer customerObj : customerData) {
 				CustomerAndProductDto dto = CustomerAndProductDto.builder().customerName(customerObj.getCustomerName())
-						.email(customerObj.getEmail()).gender(customerObj.getGender())
+						.email(customerObj.getEmail()).gender(customerObj.getGender()).userId(customerObj.getUserId())
 						.id(customerObj.getId()).mobileNo(customerObj.getMobileNo()).address(customerObj.getAddress())
 						.build();
 				List<CustomerProductDto> customerProductList = new ArrayList<>();
@@ -109,6 +110,7 @@ public class CustomerServicee {
 			Customer customer2 = customer.get();
 
 			CustomerAndProductDto customerAndProductDto = CustomerAndProductDto.builder().id(customer2.getId())
+					.userId(customer2.getUserId())
 					.address(customer2.getAddress()).customerName(customer2.getCustomerName())
 					.email(customer2.getEmail()).gender(customer2.getGender()).mobileNo(customer2.getMobileNo())
 					.customerProducts(null).build();
