@@ -27,7 +27,5 @@ public class CustomerResponse {
 	
 	private String address;
 	
-	private String date;
-	
 	private GenderType gender;
 }
