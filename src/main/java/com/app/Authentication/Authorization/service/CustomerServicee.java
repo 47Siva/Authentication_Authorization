@@ -92,6 +92,7 @@ public class CustomerServicee {
 					CustomerProductDto dto2 = CustomerProductDto.builder()
 							.price(customerProductObj.getPrice())
 							.productName(customerProductObj.getProductName())
+							.date(customerProductObj.getDate())
 							.quantity(customerProductObj.getQuantity()).totalAmount(customerProductObj.getTotalAmount())
 							.build();
 					customerProductList.add(dto2);
