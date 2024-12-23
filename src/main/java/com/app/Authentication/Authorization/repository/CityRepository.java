@@ -6,11 +6,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.app.Authentication.Authorization.entity.City;
-import com.app.Authentication.Authorization.entity.Country;
-import com.app.Authentication.Authorization.entity.State;
 
+@Repository
 public interface CityRepository extends JpaRepository<City, UUID> {
 	
 	@Query(value = "select * from city_details where name =:cityName && state_id =:id ",nativeQuery = true)

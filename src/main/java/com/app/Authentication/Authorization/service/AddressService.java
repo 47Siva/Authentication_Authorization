@@ -55,32 +55,18 @@ public class AddressService {
 	            throw new IllegalArgumentException("State already exists in the given country");
 	        }
 
-//	        Optional<State> existingState = stateRepository.findByNameAndCountry(stateName, countryId);
-
-//		if (state.isPresent() && stateCountry.isPresent()) {
-//			throw new IllegalArgumentException("State already exists in the given country");
-//		}
-
 		return ResponseEntity.ok( stateRepository.save(object));
 	}
 
 	public City addCity(City city) {
-//         City citytb =cityRepository.findByCityAndStateName(city.getState().getStateName(),city.getState().getId())
-//        		.orElseThrow(()-> new IllegalArgumentException("State and city alreday exists"));
 
 		UUID stateName = city.getState().getId();
 		String cityName = city.getCityName();
 		
-//		Optional<City> state = cityRepository.findByState(stateName);
-//		Optional<City> citytb = cityRepository.findByCity(cityName);
-		
 		if (cityRepository.findByCityNameAndStateId(cityName, stateName).isPresent()) {
             throw new IllegalArgumentException("City already exists in the given state");
         }
-		
-//		if (state.isPresent() && citytb.isPresent()) {
-//			throw new IllegalArgumentException("State already exists in the given country");
-//		}
+
 		
 		return cityRepository.save(city);
 	}
