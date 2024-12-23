@@ -48,9 +48,5 @@ public class State extends AuditwithBaseEntity implements Serializable {
     @ManyToOne(targetEntity = Country.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "country_id", nullable = false) // Foreign Key column
     private Country country;
-	
 
-//    @OneToMany(targetEntity = City.class,cascade = {CascadeType.ALL})
-//    @JoinColumn(name = "state_id",referencedColumnName = "id", nullable = false)
-//	private List<City> city;
 }
