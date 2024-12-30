@@ -138,6 +138,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>authapp</finalName>
 	</build>
 
 </project>
