@@ -79,7 +79,7 @@ public class ProductController {
 		}
 	}
 	
-	@Operation(description = "Post End Point", summary = "Get Product Api", responses = {
+	@Operation(description = "Get End Point", summary = "Get Product Api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@GetMapping("/get/product/{productName}")
@@ -98,7 +98,7 @@ public class ProductController {
 		}
 	}
 	
-	@Operation(description = "Post End Point", summary = "Get All Product Api", responses = {
+	@Operation(description = "Get End Point", summary = "Get All Product Api", responses = {
 			@ApiResponse(description = "Success", responseCode = "200"),
 			@ApiResponse(description = "Unauthorized / Invalid token", responseCode = "401") })
 	@GetMapping("/get/All/product")
