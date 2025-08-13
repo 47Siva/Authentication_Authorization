@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //				throw new ServletException("Missing or invalid Authorization header");
 			}
 			
-			jwttoken = authHeader.substring(7);
+			jwttoken = authHeader.substring(7).trim();
 			userName = jwtService.extractUserName(jwttoken);
 			if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
