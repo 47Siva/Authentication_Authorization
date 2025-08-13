@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
@@ -22,7 +23,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
 		termsOfService = "terms and service"),
 		servers = {
 		@Server(description ="http",url ="http://localhost:8081")
-		}
+		},
+		security = { @SecurityRequirement(name = "bearAuth") }
 )
 @SecurityScheme(
 		name = "bearAuth",
