@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Authentication.Authorization.entity.User;
 import com.app.Authentication.Authorization.enumeration.RequestType;
-import com.app.Authentication.Authorization.enumeration.Status;
 import com.app.Authentication.Authorization.request.UserRegisterRequest;
 import com.app.Authentication.Authorization.response.MessageService;
 import com.app.Authentication.Authorization.response.ResponseGenerator;
@@ -28,7 +26,6 @@ import com.app.Authentication.Authorization.response.TransactionContext;
 import com.app.Authentication.Authorization.security.JwtService;
 import com.app.Authentication.Authorization.service.UserService;
 import com.app.Authentication.Authorization.util.ResponseMessage;
-import com.app.Authentication.Authorization.validator.RegisterValidator;
 import com.app.Authentication.Authorization.validator.UserValidator;
 import com.app.Authentication.Authorization.validator.ValidationResult;
 
@@ -36,6 +33,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 @Tag(name = "User_Controller", description = "Hittable endpoints are welcome after user login")
+@SecurityRequirement(name = "bearAuth")
 public class UserController {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
