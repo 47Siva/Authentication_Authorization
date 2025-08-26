@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 				email = "",
 				url = ""
 				),
-		description = "Authentication & Authorization",
-		title = "Authentication-Authorization",
+		title = "Application Service API",
+		description = "Provides core services like Authentication, User, Product, Address and Invoice management",
 		version = "1.0",
 		license = @License(name = "Licence name",url = "https//some-url.com"),
 		termsOfService = "terms and service"),
