@@ -23,6 +23,7 @@ import com.app.Authentication.Authorization.request.BuyProductRequest;
 import com.app.Authentication.Authorization.response.CustomerResponse;
 import com.app.Authentication.Authorization.response.InvoiceResponse;
 import com.app.Authentication.Authorization.response.MessageService;
+import com.app.Authentication.Authorization.security.JwtService;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class CustomerServicee {
 
 	private final CustomerRepository customerRepository;
 	private final CustomerProductRepository customerProductRepository;
+	private final JwtService jwtService;
 	private final ProductRepository productRepository;
 	private @NonNull MessageService messagePropertySource;
 
@@ -44,30 +46,39 @@ public class CustomerServicee {
 		return customerRepository.findByDuplicateNumber(mobileNo);
 	}
 
-	public ResponseEntity<?> getAllCustomer() {
+	public ResponseEntity<?> getAllCustomer(String auth) {
 
-		List<Customer> customerData = customerRepository.findAll();
-		ArrayList<CustomerResponse> customerResponses = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
+		String token = jwtService.extractToken(auth);
 
-		if (customerData.isEmpty()) {
-			response.put("Error", messagePropertySource.messageResponse("Customers.empty"));
-			response.put("Status", HttpStatus.NO_CONTENT);
-			response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+		String tokenRole = jwtService.extractRole(token);
+		if (!"ADMIN".equals(tokenRole)) {
+			response.put("Status", HttpStatus.FORBIDDEN.toString());
+			response.put("message", "Access Denied: You are not authorized to access this API");
+			response.put("Error", HttpStatus.FORBIDDEN);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 		} else {
-			for (Customer customerObj : customerData) {
-				CustomerResponse customer = CustomerResponse.builder().id(customerObj.getId())
-						.userId(customerObj.getUserId())
-						.customerName(customerObj.getCustomerName())
-						.address(customerObj.getAddress()).email(customerObj.getEmail()).gender(customerObj.getGender())
-						.mobileNo(customerObj.getMobileNo()).build();
-				customerResponses.add(customer);
+			List<Customer> customerData = customerRepository.findAll();
+			ArrayList<CustomerResponse> customerResponses = new ArrayList<>();
+
+			if (customerData.isEmpty()) {
+				response.put("Error", messagePropertySource.messageResponse("Customers.empty"));
+				response.put("Status", HttpStatus.NO_CONTENT);
+				response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+			} else {
+				for (Customer customerObj : customerData) {
+					CustomerResponse customer = CustomerResponse.builder().id(customerObj.getId())
+							.userId(customerObj.getUserId()).customerName(customerObj.getCustomerName())
+							.address(customerObj.getAddress()).email(customerObj.getEmail())
+							.gender(customerObj.getGender()).mobileNo(customerObj.getMobileNo()).build();
+					customerResponses.add(customer);
+				}
+				response.put("Data", customerResponses);
+				response.put("Status", HttpStatus.OK);
+				response.put("StatusCode", HttpStatus.OK.toString());
+				return ResponseEntity.ok(response);
 			}
-			response.put("Data", customerResponses);
-			response.put("Status", HttpStatus.OK);
-			response.put("StatusCode", HttpStatus.OK.toString());
-			return ResponseEntity.ok(response);
 		}
 	}
 
@@ -89,10 +100,8 @@ public class CustomerServicee {
 						.build();
 				List<CustomerProductDto> customerProductList = new ArrayList<>();
 				for (CustomerProduct customerProductObj : customerObj.getCustomerProducet()) {
-					CustomerProductDto dto2 = CustomerProductDto.builder()
-							.price(customerProductObj.getPrice())
-							.productName(customerProductObj.getProductName())
-							.date(customerProductObj.getDate())
+					CustomerProductDto dto2 = CustomerProductDto.builder().price(customerProductObj.getPrice())
+							.productName(customerProductObj.getProductName()).date(customerProductObj.getDate())
 							.quantity(customerProductObj.getQuantity()).totalAmount(customerProductObj.getTotalAmount())
 							.build();
 					customerProductList.add(dto2);
@@ -104,57 +113,130 @@ public class CustomerServicee {
 		}
 	}
 
-	public ResponseEntity<?> getCustomer(String customerEmail) {
+	public ResponseEntity<?> getCustomer(String customerEmail, String auth) {
 		Optional<Customer> customer = customerRepository.findByDuplicateEamil(customerEmail);
 		Map<String, Object> response = new HashMap<>();
-		if (customer.isPresent()) {
-			Customer customer2 = customer.get();
+		String token = jwtService.extractToken(auth);
 
-			CustomerAndProductDto customerAndProductDto = CustomerAndProductDto.builder().id(customer2.getId())
-					.userId(customer2.getUserId())
-					.address(customer2.getAddress()).customerName(customer2.getCustomerName())
-					.email(customer2.getEmail()).gender(customer2.getGender()).mobileNo(customer2.getMobileNo())
-					.customerProducts(null).build();
+		String tokenRole = jwtService.extractRole(token);
+		if (!"ADMIN".equals(tokenRole)&& !"CUSTOMER".equals(tokenRole)) {
+			response.put("Status", HttpStatus.FORBIDDEN.toString());
+			response.put("message", "Access Denied: You are not authorized to access this API");
+			response.put("Error", HttpStatus.FORBIDDEN);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+		} else {
+			if (customer.isPresent()) {
+				Customer customer2 = customer.get();
 
-			double totalProductAmount = 0d;
-			double singleProductAmount = 0d;
+				CustomerAndProductDto customerAndProductDto = CustomerAndProductDto.builder().id(customer2.getId())
+						.userId(customer2.getUserId()).address(customer2.getAddress())
+						.customerName(customer2.getCustomerName()).email(customer2.getEmail())
+						.gender(customer2.getGender()).mobileNo(customer2.getMobileNo()).customerProducts(null).build();
+
+				double totalProductAmount = 0d;
+				double singleProductAmount = 0d;
 //			int availableQuantity = 0;
 
-			ArrayList<CustomerProductDto> dtolist = new ArrayList<>();
-			List<CustomerProduct> customerProduct = customer2.getCustomerProducet();
-			for (CustomerProduct obj : customerProduct) {
-				CustomerProductDto customerProductDto = CustomerProductDto.builder()
-						.price(obj.getPrice()).productName(obj.getProductName()).date(obj.getDate()).quantity(obj.getQuantity())
-						.totalAmount(obj.getTotalAmount()).build();
-				Optional<Product> product1 = productRepository.findByName(obj.getProductName());
-				Product productobj = product1.get();
-				singleProductAmount = obj.getQuantity() * productobj.getPrice();
-				totalProductAmount += singleProductAmount;
-				dtolist.add(customerProductDto);
+				ArrayList<CustomerProductDto> dtolist = new ArrayList<>();
+				List<CustomerProduct> customerProduct = customer2.getCustomerProducet();
+				for (CustomerProduct obj : customerProduct) {
+					CustomerProductDto customerProductDto = CustomerProductDto.builder().price(obj.getPrice())
+							.productName(obj.getProductName()).date(obj.getDate()).quantity(obj.getQuantity())
+							.totalAmount(obj.getTotalAmount()).build();
+					Optional<Product> product1 = productRepository.findByName(obj.getProductName());
+					Product productobj = product1.get();
+					singleProductAmount = obj.getQuantity() * productobj.getPrice();
+					totalProductAmount += singleProductAmount;
+					dtolist.add(customerProductDto);
+				}
+				customerAndProductDto.setCustomerProducts(dtolist);
+
+				String Gststr = "5%";
+				String shopDiscountStr = "2%";
+				double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
+				double Gst = Double.parseDouble(Gststr.replace("%", "")) / 100.0;
+				double GstAmount = Gst * totalProductAmount;
+				double discountAmount = shopDiscount * totalProductAmount;
+				double grandTotal = totalProductAmount + GstAmount - discountAmount;
+
+				InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerAndProductDto).gst(Gststr)
+						.shopDiscount(shopDiscountStr).gstAmount(GstAmount).discountAmount(discountAmount)
+						.grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();
+
+				response.put("Data", invoiceResponse);
+				response.put("Status", HttpStatus.OK);
+				response.put("StatusCode", HttpStatus.OK.toString());
+				return ResponseEntity.ok(response);
+			} else {
+				response.put("Error", messagePropertySource.messageResponse("Customer.notfound"));
+				response.put("Status", HttpStatus.NO_CONTENT);
+				response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 			}
-			customerAndProductDto.setCustomerProducts(dtolist);
+		}
+	}
 
-			String Gststr = "5%";
-			String shopDiscountStr = "2%";
-			double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
-			double Gst = Double.parseDouble(Gststr.replace("%", "")) / 100.0;
-			double GstAmount = Gst * totalProductAmount;
-			double discountAmount = shopDiscount * totalProductAmount;
-			double grandTotal = totalProductAmount + GstAmount - discountAmount;
+	public ResponseEntity<?> getCustomerId(String customerId, String auth) {
+		Optional<Customer> customer = customerRepository.findByUserId(customerId);
+		Map<String, Object> response = new HashMap<>();
 
-			InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerAndProductDto).gst(Gststr)
-					.shopDiscount(shopDiscountStr).gstAmount(GstAmount).discountAmount(discountAmount)
-					.grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();
+		String token = jwtService.extractToken(auth);
 
-			response.put("Data", invoiceResponse);
-			response.put("Status", HttpStatus.OK);
-			response.put("StatusCode", HttpStatus.OK.toString());
-			return ResponseEntity.ok(response);
+		String tokenRole = jwtService.extractRole(token);
+		if (!"ADMIN".equals(tokenRole)&& !"CUSTOMER".equals(tokenRole)) {
+			response.put("Status", HttpStatus.FORBIDDEN.toString());
+			response.put("message", "Access Denied: You are not authorized to access this API");
+			response.put("Error", HttpStatus.FORBIDDEN);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 		} else {
-			response.put("Error", messagePropertySource.messageResponse("Customer.notfound"));
-			response.put("Status", HttpStatus.NO_CONTENT);
-			response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+			if (customer.isPresent()) {
+				Customer customer2 = customer.get();
+
+				CustomerAndProductDto customerAndProductDto = CustomerAndProductDto.builder().id(customer2.getId())
+						.userId(customer2.getUserId()).address(customer2.getAddress())
+						.customerName(customer2.getCustomerName()).email(customer2.getEmail())
+						.gender(customer2.getGender()).mobileNo(customer2.getMobileNo()).customerProducts(null).build();
+
+				double totalProductAmount = 0d;
+				double singleProductAmount = 0d;
+//			int availableQuantity = 0;
+
+				ArrayList<CustomerProductDto> dtolist = new ArrayList<>();
+				List<CustomerProduct> customerProduct = customer2.getCustomerProducet();
+				for (CustomerProduct obj : customerProduct) {
+					CustomerProductDto customerProductDto = CustomerProductDto.builder().price(obj.getPrice())
+							.productName(obj.getProductName()).date(obj.getDate()).quantity(obj.getQuantity())
+							.totalAmount(obj.getTotalAmount()).build();
+					Optional<Product> product1 = productRepository.findByName(obj.getProductName());
+					Product productobj = product1.get();
+					singleProductAmount = obj.getQuantity() * productobj.getPrice();
+					totalProductAmount += singleProductAmount;
+					dtolist.add(customerProductDto);
+				}
+				customerAndProductDto.setCustomerProducts(dtolist);
+
+				String Gststr = "5%";
+				String shopDiscountStr = "2%";
+				double shopDiscount = Double.parseDouble(shopDiscountStr.replace("%", "")) / 100.0;
+				double Gst = Double.parseDouble(Gststr.replace("%", "")) / 100.0;
+				double GstAmount = Gst * totalProductAmount;
+				double discountAmount = shopDiscount * totalProductAmount;
+				double grandTotal = totalProductAmount + GstAmount - discountAmount;
+
+				InvoiceResponse invoiceResponse = InvoiceResponse.builder().customer(customerAndProductDto).gst(Gststr)
+						.shopDiscount(shopDiscountStr).gstAmount(GstAmount).discountAmount(discountAmount)
+						.grandTotalAmount(grandTotal).totalprouctsAmount(totalProductAmount).build();
+
+				response.put("Data", invoiceResponse);
+				response.put("Status", HttpStatus.OK);
+				response.put("StatusCode", HttpStatus.OK.toString());
+				return ResponseEntity.ok(response);
+			} else {
+				response.put("Error", messagePropertySource.messageResponse("Customer.notfound"));
+				response.put("Status", HttpStatus.NO_CONTENT);
+				response.put("StatusCode", HttpStatus.NO_CONTENT.toString());
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+			}
 		}
 	}
 

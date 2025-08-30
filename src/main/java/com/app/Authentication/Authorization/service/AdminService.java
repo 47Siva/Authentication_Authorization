@@ -45,22 +45,32 @@ public class AdminService {
 			if (!jwtService.validateToken(token)) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
 			}
-			Optional<User> userdetails = userRepository.findByUserEmail(useremail);
-			if (userdetails.isPresent()) {
-				User user = userdetails.get();
-				UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail()).userName(user.getApplicationUserName())
-						.mobileNo(user.getMobileNo()).status(user.getStatus()).userRole(user.getUserRole()).build();
 
-				// Retrieve user details
-				UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
-				response.put("Authorities", userDetails.getAuthorities());
-				response.put("Details", userresponse);
-				return ResponseEntity.ok(response);
+			String tokenRole = jwtService.extractRole(token);
+			if (!"ADMIN".equals(tokenRole)) {
+				response.put("Status", HttpStatus.FORBIDDEN.toString());
+				response.put("message", "Access Denied: You are not authorized to access this API");
+				response.put("Error", HttpStatus.FORBIDDEN);
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 			} else {
-				response.put("Status", HttpStatus.NO_CONTENT.toString());
-				response.put("message", "User id is invalid pleas check the ID");
-				response.put("Error", HttpStatus.NO_CONTENT);
-				return ResponseEntity.internalServerError().body(response);
+				Optional<User> userdetails = userRepository.findByUserEmail(useremail);
+				if (userdetails.isPresent()) {
+					User user = userdetails.get();
+					UserResponse userresponse = UserResponse.builder().userId(user.getId()).email(user.getEmail())
+							.userName(user.getApplicationUserName()).mobileNo(user.getMobileNo())
+							.status(user.getStatus()).userRole(user.getUserRole()).build();
+
+					// Retrieve user details
+					UserDetails userDetails = userService.loadUserByUsername(userdetails.get().getUsername());
+					response.put("Authorities", userDetails.getAuthorities());
+					response.put("Details", userresponse);
+					return ResponseEntity.ok(response);
+				} else {
+					response.put("Status", HttpStatus.NO_CONTENT.toString());
+					response.put("message", "User id is invalid pleas check the ID");
+					response.put("Error", HttpStatus.NO_CONTENT);
+					return ResponseEntity.internalServerError().body(response);
+				}
 			}
 		} catch (SignatureException e) {
 			e.printStackTrace();

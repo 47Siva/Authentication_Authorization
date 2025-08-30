@@ -19,7 +19,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID>{
 	@Query(value = "SELECT * FROM customer_details where mobile_no =:mobileNo ", nativeQuery = true)
 	Optional<Customer> findByDuplicateNumber(String mobileNo);
 
-	@Query(value = "SELECT * FROM customer_details where user_id =:userId ", nativeQuery = true)
+	@Query(value = "SELECT * FROM customer_details where id =:userId ", nativeQuery = true)
 	Optional<Customer> findByUserId(String userId);
 
 }

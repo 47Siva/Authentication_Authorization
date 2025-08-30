@@ -25,30 +25,30 @@ public class ApplicationConfig {
 
     private final UserRepository userRepository;
 
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//    	
-//    	
-//        return username ->  userRepository.findByUserName(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("user name not found..! from token"));
-//
-//    }
     @Bean
     public UserDetailsService userDetailsService() {
+    	
+    	
+        return username ->  userRepository.findByUserEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("user name not found..! from token"));
 
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        		Optional<User> userOptional = userRepository.findByUserEmail(username);
-        		if (!userOptional.isPresent()) {
-        			throw new UsernameNotFoundException("User not found from the token with username: " + username);
-        		}
-        		User user = userOptional.get();
-        		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-        				user.getAuthorities());
-        	}
-        };
     }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//
+//        return new UserDetailsService() {
+//            @Override
+//            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        		Optional<User> userOptional = userRepository.findByUserEmail(username);
+//        		if (!userOptional.isPresent()) {
+//        			throw new UsernameNotFoundException("User not found from the token with username: " + username);
+//        		}
+//        		User user = userOptional.get();
+//        		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+//        				user.getAuthorities());
+//        	}
+//        };
+//    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
